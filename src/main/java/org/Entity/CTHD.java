@@ -1,4 +1,4 @@
-package Entity;
+package org.Entity;
 
 public class CTHD {
 }

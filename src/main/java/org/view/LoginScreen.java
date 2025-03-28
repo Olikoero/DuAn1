@@ -1,14 +1,9 @@
-package org.example;
+package org.view;
 
-import util.Auth;
-import util.MsgBox;
-import util.XImage;
+import org.util.XImage;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class LoginScreen extends JFrame {
     public LoginScreen() {

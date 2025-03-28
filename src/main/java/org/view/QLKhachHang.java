@@ -1,11 +1,11 @@
-package org.example;
+package org.view;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-import static org.example.QLNhanVien.*;
+import static org.view.QLNhanVien.*;
 
 public class QLKhachHang extends JPanel {
     private JTable tblKhachHang;
