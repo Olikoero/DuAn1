@@ -46,10 +46,22 @@ public class ThongKe extends JPanel {
         JPanel pnlLocThang = new JPanel(null);
         pnlLocThang.setBorder(new LineBorder(Color.BLACK,1));
         pnlLocThang.setBounds(20,10,350,80);
+        JLabel lblTitleThang = new JLabel("Theo tháng: ");
+        lblTitleThang.setBounds(20,20,80,40);
+        JComboBox<String> cboThang = new JComboBox<>();
+        cboThang.setBounds(100,20,230,40);
+        pnlLocThang.add(lblTitleThang);
+        pnlLocThang.add(cboThang);
 
         JPanel pnlLocNam = new JPanel(null);
         pnlLocNam.setBorder(new LineBorder(Color.BLACK,1));
         pnlLocNam.setBounds(390,10,350,80);
+        JLabel lblTitleNam = new JLabel("Theo năm: ");
+        lblTitleNam.setBounds(20,20,80,40);
+        JComboBox<String> cboNam = new JComboBox<>();
+        cboNam.setBounds(100,20,230,40);
+        pnlLocNam.add(lblTitleNam);
+        pnlLocNam.add(cboNam);
 
         JButton btnXoaLoc=new JButton("Xoá bộ lọc");
         btnXoaLoc.setBounds(760,25,166,50);
@@ -58,7 +70,7 @@ public class ThongKe extends JPanel {
 
         JPanel pnlDanhSach = new JPanel(null);
         pnlDanhSach.setBorder(new LineBorder(Color.BLUE,1));
-        pnlDanhSach.setBounds(20,360,946,320);
+        pnlDanhSach.setBounds(20,360,946,330);
 
         add(lblDoanhThu);
         add(pnlCapNhat);

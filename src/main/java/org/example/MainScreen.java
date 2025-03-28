@@ -58,7 +58,7 @@ public class MainScreen extends JFrame {
         txtUser.setBackground(defaultBorderColor);
         txtUser.setBorder(BorderFactory.createEmptyBorder(0,15,0,15));
         txtUser.setEditable(false);
-        btnMnuTroGiup = new JButton("Trợ giúp");
+        btnMnuTroGiup = new JButton("Hướng dẫn");
         btnMnuTroGiup.setFont(menuFont);
         btnMnuTroGiup.setBounds(5, 60, 190, 40);
         btnLogin = new JButton();
