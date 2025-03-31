@@ -1,34 +1,47 @@
 package org.view;
 
+import org.DAO.NhanVienDAO;
+import org.util.EmailUtils;
+import org.util.JDBCHelper;
+import org.util.MsgBox;
+
+import javax.mail.MessagingException;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Random;
 
 public class FogotPass extends JPanel {
     private JTextField txtUser;
-    private JButton btnNewPass,btnBack;
-    public FogotPass(){
-        setSize(200,500);
+    private JButton btnSendCode, btnBack;
+    private NhanVienDAO nhanVienDAO = new NhanVienDAO();
+    private EmailUtils emailEntity = new EmailUtils(); // Khởi tạo đối tượng EmailEntity
+
+    public FogotPass() {
+        setSize(200, 500);
         setVisible(true);
         setLayout(null);
         setBackground(Color.white);
-        //Title
-        JLabel lblTitle = new JLabel("THUNDER SHOP", SwingConstants.CENTER);
-        lblTitle.setIcon(new ImageIcon("img/flash.png"));
-        lblTitle.setForeground(Color.ORANGE);
+
+        // Khai báo font
         Font font = new Font("Bernard MT Condensed", Font.BOLD, 24);
         Font font2 = new Font("Arial", Font.BOLD, 18);
         Font font1 = new Font("Arial", Font.PLAIN, 14);
         Font font4 = new Font("Arial", Font.ITALIC, 12);
+
+        // Giao diện
+        JLabel lblTitle = new JLabel("THUNDER SHOP", SwingConstants.CENTER);
+        lblTitle.setIcon(new ImageIcon("img/flash.png"));
+        lblTitle.setForeground(Color.ORANGE);
         lblTitle.setFont(font);
         lblTitle.setBounds(10, 30, 180, 50);
-
 
         JLabel lblTitleLogin = new JLabel("QUÊN MẬT KHẨU", SwingConstants.CENTER);
         lblTitleLogin.setFont(font2);
         lblTitleLogin.setBounds(20, 90, 160, 40);
+
         JLabel lblUser = new JLabel("EMAIL NGƯỜI DÙNG");
         lblUser.setFont(font1);
         lblUser.setBounds(20, 130, 160, 30);
@@ -37,19 +50,17 @@ public class FogotPass extends JPanel {
 
         JTextArea txtaInfo = new JTextArea("Vui lòng nhập thông tin Email bạn đã đăng kí!");
         txtaInfo.setFont(font4);
-        txtaInfo.setBounds(20,205,160,80);
+        txtaInfo.setBounds(20, 205, 160, 80);
         txtaInfo.setWrapStyleWord(true);
         txtaInfo.setLineWrap(true);
-        txtaInfo.setOpaque(false); // Làm cho nó trong suốt giống JLabel
+        txtaInfo.setOpaque(false);
         txtaInfo.setEditable(false);
         txtaInfo.setFocusable(false);
 
-        btnNewPass = new JButton();
-        btnNewPass.setIcon(new ImageIcon("img/loginn.png"));
-        btnNewPass.setBounds(80, 300, 40, 40);
-        btnNewPass.setFocusPainted(false);
-        btnNewPass.setBackground(Color.WHITE);
-        btnNewPass.setBorder(new LineBorder(new Color(200, 200, 200), 2));
+        btnSendCode = new JButton("GỬI MẬT KHẨU MỚI");
+        btnSendCode.setBounds(20, 300, 160, 40);
+        btnSendCode.setBackground(Color.ORANGE);
+        btnSendCode.setForeground(Color.WHITE);
 
         btnBack = new JButton("<html><u>QUAY LẠI ĐĂNG NHẬP!</u></html>");
         btnBack.setFocusPainted(false);
@@ -60,33 +71,88 @@ public class FogotPass extends JPanel {
         btnBack.setBounds(5, 400, 190, 40);
 
 
+
+        // Thêm tất cả thành phần vào panel
         add(lblTitle);
         add(lblTitleLogin);
         add(lblUser);
         add(txtUser);
         add(txtaInfo);
-        add(btnNewPass);
+        add(btnSendCode);
         add(btnBack);
-        btnBack.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                btnBack.setForeground(Color.gray);
-            }
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                btnBack.setForeground(Color.BLUE);
-            }
-        });
+        // Sự kiện nút "Gửi mật khẩu mới"
+        btnSendCode.addActionListener(e -> resetPasswordAndSendEmail());
+
+        // Sự kiện nút "Quay lại"
         btnBack.addActionListener(e -> showPanel(new Login()));
     }
 
+    // Hàm xử lý reset mật khẩu và gửi email
+    private void resetPasswordAndSendEmail() {
+        String email = txtUser.getText().trim();
+        if (email.isEmpty()) {
+            MsgBox.alert(this,"Vui lòng nhập email!");
+            return;
+        }
+
+        try {
+            // Kiểm tra email có tồn tại trong database không
+            if (!nhanVienDAO.checkEmailExists(email)) {
+                MsgBox.alert(this,"Email không tồn tại!");
+                return;
+            }
+
+            // Tạo mật khẩu mới
+            String newPassword = generateRandomPassword(8);
+
+            // Cập nhật mật khẩu mới vào database
+            updatePasswordInDatabase(email, newPassword);
+
+            // Gửi email chứa mật khẩu mới bằng EmailEntity
+            emailEntity.sendNewPasswordEmail(email, newPassword);
+
+            MsgBox.alert(this,"Mật khẩu mới đã được gửi qua email!");
+
+        } catch (SQLException ex) {
+            MsgBox.alert(this,"Lỗi khi cập nhật database!");
+            ex.printStackTrace();
+        } catch (MessagingException ex) {
+            MsgBox.alert(this,"Lỗi khi gửi email!");
+            ex.printStackTrace();
+        }
+    }
+
+    // Hàm tạo mật khẩu ngẫu nhiên
+    private String generateRandomPassword(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder password = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            password.append(characters.charAt(random.nextInt(characters.length())));
+        }
+        return password.toString();
+    }
+
+    // Hàm cập nhật mật khẩu vào database
+    private void updatePasswordInDatabase(String email, String newPassword) throws SQLException {
+        String sql = "UPDATE NhanVien SET MatKhau = ? WHERE Email = ?";
+        try (Connection conn = JDBCHelper.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, newPassword);
+            pstmt.setString(2, email);
+            pstmt.executeUpdate();
+        }
+    }
+
+    // Hàm chuyển panel
     private void showPanel(JPanel panel) {
-        this.removeAll(); // Xóa nội dung cũ
-        this.add(panel, BorderLayout.CENTER); // Thêm panel mới
-        this.revalidate(); // Cập nhật giao diện
+        this.removeAll();
+        this.add(panel, BorderLayout.CENTER);
+        this.revalidate();
         this.repaint();
     }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Forgot Password");
@@ -95,10 +161,7 @@ public class FogotPass extends JPanel {
             frame.setLayout(null);
             frame.setResizable(false);
             frame.setLocationRelativeTo(null);
-
-            FogotPass panel = new FogotPass();
-            frame.add(panel);
-
+            frame.add(new FogotPass());
             frame.setVisible(true);
         });
     }

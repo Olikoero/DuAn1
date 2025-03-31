@@ -27,6 +27,7 @@ public class LoginScreen extends JFrame {
         add(pnlLogin);
         setVisible(true);
     }
+
     public static void main(String[] args) {
         new LoginScreen();
     }

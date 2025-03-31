@@ -6,6 +6,7 @@ public class NhanVien {
     private String hoVaTen;
     private boolean vaiTro;
     private String email;
+    private int gioitinh;
 
     public String getMaNv() {
         return maNv;
@@ -46,4 +47,13 @@ public class NhanVien {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public int getGioitinh() {
+        return gioitinh;
+    }
+
+    public void setGioitinh(int gioitinh) {
+        this.gioitinh = gioitinh;
+    }
 }
+
