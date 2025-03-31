@@ -1,6 +1,6 @@
-package util;
+package org.util;
 
-import Entity.NhanVien;
+import org.Entity.NhanVien;
 
 public class Auth {
     public static NhanVien user=null;

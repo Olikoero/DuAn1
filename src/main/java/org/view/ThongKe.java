@@ -1,11 +1,11 @@
-package org.example;
+package org.view;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-import static org.example.QLNhanVien.addCompoment;
+import static org.view.QLNhanVien.addCompoment;
 
 public class ThongKe extends JPanel {
     public ThongKe(){

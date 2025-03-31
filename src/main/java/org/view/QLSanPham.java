@@ -1,10 +1,10 @@
-package org.example;
+package org.view;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 
-import static org.example.QLNhanVien.addCompoment;
+import static org.view.QLNhanVien.addCompoment;
 
 public class QLSanPham extends JPanel {
     private JLabel lblAnh;
