@@ -221,6 +221,7 @@ public class MainScreen extends JFrame {
         pnlTrangThai.add(lblTrangThai, BorderLayout.WEST);
         pnlTrangThai.add(lblDongHo, BorderLayout.EAST);
         btnChangePass.addActionListener(e -> showPanel(new ChangePass()));
+        //a
 
         add(pnlMenu);
         add(pnlMain);
