@@ -2,6 +2,7 @@ package org.example;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 import static org.example.QLNhanVien.addCompoment;
@@ -68,15 +69,53 @@ public class ThongKe extends JPanel {
 
         addCompoment(pnlLoc,pnlLocThang,pnlLocNam,btnXoaLoc);
 
-        JPanel pnlDanhSach = new JPanel(null);
-        pnlDanhSach.setBorder(new LineBorder(Color.BLUE,1));
-        pnlDanhSach.setBounds(20,360,946,330);
+        JTabbedPane tabs=new JTabbedPane();
+        tabs.setBounds(20,360,946,330);
+
+
+        JPanel pnlDoanhThu = new JPanel(null);
+        JTable tblBangDiem = new JTable(new DefaultTableModel(
+                new Object[][]{}, new String[]{"TÊN SẢN PHẨM", "ĐÃ BÁN", "TỔNG TIỀN BÁN", "GIÁ GỐC","LỢI NHUẬN"}
+        ));
+        JScrollPane scrollPaneDT = new JScrollPane(tblBangDiem);
+        scrollPaneDT.setBounds(10, 10, 926, 290);
+        pnlDoanhThu.add(scrollPaneDT);
+        tabs.add(pnlDoanhThu,"Doanh thu theo tháng");
+
+        JPanel pnlBanChay = new JPanel(null);
+        JTable tblBanChay = new JTable(new DefaultTableModel(
+                new Object[][]{}, new String[]{"TÊN SẢN PHẨM", "LOẠI SẢN PHẨM", "ĐÃ BÁN", "CÒN LẠI TRONG KHO"}
+        ));
+        JScrollPane scrollPaneBC = new JScrollPane(tblBanChay);
+        scrollPaneBC.setBounds(10, 10, 926, 290);
+        pnlBanChay.add(scrollPaneBC);
+
+        JPanel pnlTonKho = new JPanel(null);
+        JTable tblTonKho = new JTable(new DefaultTableModel(
+                new Object[][]{}, new String[]{"TÊN SẢN PHẨM", "LOẠI SẢN PHẨM", "ĐÃ BÁN", "CÒN LẠI TRONG KHO"}
+        ));
+        JScrollPane scrollPaneTK = new JScrollPane(tblTonKho);
+        scrollPaneTK.setBounds(10, 10, 926, 290);
+        pnlTonKho.add(scrollPaneTK);
+
+        JPanel pnlThanhTich = new JPanel(null);
+        JTable tblThanhTich = new JTable(new DefaultTableModel(
+                new Object[][]{}, new String[]{"MÃ NV", "TÊN NV", "SỐ ĐƠN ĐÃ BÁN"}
+        ));
+        JScrollPane scrollPaneTT = new JScrollPane(tblThanhTich);
+        scrollPaneTT.setBounds(10, 10, 926, 290);
+        pnlThanhTich.add(scrollPaneTT);
+
+        tabs.add(pnlDoanhThu,"Doanh thu theo tháng");
+        tabs.add(pnlBanChay,"Bán chạy");
+        tabs.add(pnlTonKho,"Tồn kho");
+        tabs.add(pnlThanhTich,"Thành tích nhân viên");
 
         add(lblDoanhThu);
         add(pnlCapNhat);
         add(lblBoLoc);
         add(pnlLoc);
-        add(pnlDanhSach);
+        add(tabs);
     }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

@@ -17,37 +17,37 @@ public class ChangePass extends JPanel {
         JLabel lblTitle = new JLabel("ĐỔI MẬT KHẨU");
         lblTitle.setFont(font);
         lblTitle.setForeground(Color.BLUE);
-        lblTitle.setBounds(70,30,300,50);
+        lblTitle.setBounds(368,30,300,50);
 
         JLabel lblMaNV = new JLabel("TÊN ĐĂNG NHẬP");
-        lblMaNV.setBounds(120, 120, 250, 40);
+        lblMaNV.setBounds(368, 120, 250, 40);
         lblMaNV.setFont(font1);
         txtMaNV = new JTextField();
-        txtMaNV.setBounds(120, 170, 250, 40);
+        txtMaNV.setBounds(368, 170, 250, 40);
 
         JLabel lblMatKhau = new JLabel("MẬT KHẨU HIỆN TẠI");
-        lblMatKhau.setBounds(120, 220, 250, 40);
+        lblMatKhau.setBounds(368, 220, 250, 40);
         lblMatKhau.setFont(font1);
         txtMatKhau = new JPasswordField();
-        txtMatKhau.setBounds(120, 270, 250, 40);
+        txtMatKhau.setBounds(368, 270, 250, 40);
 
         JLabel lblMatKhau1 = new JLabel("MẬT KHẨU MỚI");
-        lblMatKhau1.setBounds(120, 320, 250, 40);
+        lblMatKhau1.setBounds(368, 320, 250, 40);
         lblMatKhau1.setFont(font1);
         txtMatKhau1 = new JPasswordField();
-        txtMatKhau1.setBounds(120, 370, 250, 40);
+        txtMatKhau1.setBounds(368, 370, 250, 40);
 
         JLabel lblMatKhau2 = new JLabel("XÁC NHẬN MẬT KHẨU");
-        lblMatKhau2.setBounds(120, 420, 250, 40);
+        lblMatKhau2.setBounds(368, 420, 250, 40);
         lblMatKhau2.setFont(font1);
         txtMatKhau2 = new JPasswordField();
-        txtMatKhau2.setBounds(120, 470, 250, 40);
+        txtMatKhau2.setBounds(368, 470, 250, 40);
 
         // Tạo các JButton
         btnDongY = new JButton("ĐỒNG Ý");
-        btnDongY.setBounds(185,550 , 120, 50);
+        btnDongY.setBounds(433,550 , 120, 50);
         btnDongY.setIcon(new ImageIcon("img/Refresh.png"));
-
+// qưeqưeqe
 
         add(lblTitle);
         add(lblMaNV);
