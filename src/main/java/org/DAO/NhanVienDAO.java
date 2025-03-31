@@ -25,22 +25,22 @@ import javax.mail.internet.MimeMessage;
  * @author huanl
  */
 public class NhanVienDAO extends DuAnDAO<NhanVien, String> {
-    final String INSERT_SQL = "INSERT INTO Nhanvien(MaNV,MatKhau,HoTen,VaiTro,GioiTinh) Values(?,?,?,?,?)";
-    final String UPDATE_SQL = "UPDATE Nhanvien set MatKhau = ?, Hoten =?, VaiTro=?, GioiTinh=? WHERE MaNV=?";
+    final String INSERT_SQL = "INSERT INTO Nhanvien(MaNV,MatKhau,HoTen,VaiTro,Email) Values(?,?,?,?,?)";
+    final String UPDATE_SQL = "UPDATE Nhanvien set MatKhau = ?, Hoten =?, VaiTro=?, Email=? WHERE MaNV=?";
     final String DELETE_SQL = "DELETE FROM NhanVien WHERE MaNV=?";
     final String SELECT_ALL_SQL = "SELECT * FROM NhanVien";
     final String SELECT_BY_ID = "SELECT * FROM NhanVien WHERE MaNV=?";
 
     @Override
     public void insert(NhanVien entity) throws SQLException {
-        JDBCHelper.update(INSERT_SQL, entity.getMaNv(), entity.getMatKhau(), entity.getHoVaTen(),entity.isVaiTro(),entity.getGioitinh());
+        JDBCHelper.update(INSERT_SQL, entity.getMaNv(), entity.getMatKhau(), entity.getHoVaTen(),entity.isVaiTro(),entity.getEmail());
     }
 
 
     @Override
     public void update(NhanVien entity) throws SQLException {
 
-        JDBCHelper.update(UPDATE_SQL,entity.getMatKhau(), entity.getHoVaTen(), entity.isVaiTro(), entity.getGioitinh(), entity.getMaNv());
+        JDBCHelper.update(UPDATE_SQL,entity.getMatKhau(), entity.getHoVaTen(), entity.isVaiTro(), entity.getEmail(), entity.getMaNv());
     }
 
 
@@ -91,7 +91,6 @@ public class NhanVienDAO extends DuAnDAO<NhanVien, String> {
                 entity.setHoVaTen(rs.getString("HoTen"));
                 entity.setMatKhau(rs.getString("MatKhau"));
                 entity.setVaiTro(rs.getBoolean("Vaitro"));
-                entity.setGioitinh(rs.getInt("GioiTinh"));
                 entity.setEmail(rs.getString("Email"));
                 listNhanVien.add(entity);
             }
