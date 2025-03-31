@@ -1,7 +1,7 @@
-package org.example;
-import util.Auth;
-import util.MsgBox;
-import util.XImage;
+package org.view;
+import org.util.Auth;
+import org.util.MsgBox;
+import org.util.XImage;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
