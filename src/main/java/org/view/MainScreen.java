@@ -221,6 +221,7 @@ public class MainScreen extends JFrame {
         pnlTrangThai.add(lblTrangThai, BorderLayout.WEST);
         pnlTrangThai.add(lblDongHo, BorderLayout.EAST);
         btnChangePass.addActionListener(e -> showPanel(new ChangePass()));
+        //a
 
         add(pnlMenu);
         add(pnlMain);
@@ -229,15 +230,10 @@ public class MainScreen extends JFrame {
     }
 
     private void showPanel(JPanel panel) {
-        if (!Auth.isLogin()) {
             pnlMain.removeAll(); // Xóa nội dung cũ
             pnlMain.add(panel, BorderLayout.CENTER); // Thêm panel mới
             pnlMain.revalidate(); // Cập nhật giao diện
             pnlMain.repaint();
-        } else {
-            MsgBox.alert(this, "Vui lòng đăng nhập");
-        }
-
     }
 
 
@@ -245,4 +241,3 @@ public class MainScreen extends JFrame {
         new MainScreen();
     }
 }
-

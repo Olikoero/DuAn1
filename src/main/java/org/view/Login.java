@@ -5,13 +5,20 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.prefs.Preferences;
+
+import org.DAO.*;
+import org.Entity.*;
+import org.util.*;
 
 public class Login extends JPanel {
     private JTextField txtUser;
     private JPasswordField txtPass;
     private JButton btnLogin, btnForgotPass;
     private JCheckBox chkremember;
+    private Preferences prefs = Preferences.userNodeForPackage(Login.class);
     public Login(){
+
         setSize(200,500);
         setVisible(true);
         setLayout(null);
@@ -71,6 +78,14 @@ public class Login extends JPanel {
         add(chkremember);
         add(btnLogin);
         add(btnForgotPass);
+        String savedUser = prefs.get("username", "");
+        String savedPass = prefs.get("password", "");
+        boolean remember = prefs.getBoolean("remember", false);
+
+        txtUser.setText(savedUser);
+        txtPass.setText(savedPass);
+        chkremember.setSelected(remember);
+
         btnForgotPass.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -83,6 +98,33 @@ public class Login extends JPanel {
             }
         });
         btnForgotPass.addActionListener(e -> showPanel(new FogotPass()));
+        btnLogin.addActionListener(e -> DangNhap());
+    }
+    NhanVienDAO nvDAO = new NhanVienDAO();
+    void DangNhap() {
+        new JDBCHelper();
+        String manv = txtUser.getText();
+        String matKhau = new String(txtPass.getPassword());
+        NhanVien nv = nvDAO.selectByID(manv);
+
+        if (nv == null) {
+            MsgBox.alert(this, "Sai tên đăng nhập!");
+        } else if (!matKhau.equals(nv.getMatKhau())) {
+            MsgBox.alert(this, "Sai mật khẩu!");
+        } else if (chkremember.isSelected()) {
+            prefs.put("username", manv);
+            prefs.put("password", matKhau);
+            prefs.putBoolean("remember", true);
+//            MsgBox.alert(this, "Đăng Nhập Thành Công!");
+            Auth.user = nv;
+            new MainScreen();
+        } else {
+            prefs.remove("username");
+            prefs.remove("password");
+            prefs.remove("remember");
+            Auth.user = nv;
+            new MainScreen();
+        }
 
     }
     private void showPanel(JPanel panel) {
@@ -91,6 +133,7 @@ public class Login extends JPanel {
         this.revalidate(); // Cập nhật giao diện
         this.repaint();
     }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
