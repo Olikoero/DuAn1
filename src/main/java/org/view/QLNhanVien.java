@@ -18,7 +18,8 @@ public class QLNhanVien extends JPanel {
         setSize(986, 713);
         setLayout(null);
 
-        Font font= new Font("Arial",Font.PLAIN,14);
+        Font font= new Font("Arial",Font.BOLD,14);
+
 
         //Tiêu đề
         JLabel lblTitle = new JLabel("QUẢN LÝ NHÂN VIÊN");
@@ -116,6 +117,7 @@ public class QLNhanVien extends JPanel {
         });
         JScrollPane scrollPane = new JScrollPane(tblNhanVien);
         scrollPane.setBounds(10, 10, 536, 563);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Danh sách nhân viên"));
         pnlDanhSach.add(scrollPane);
 
         add(pnlCapNhat);

@@ -9,12 +9,12 @@ import static org.view.QLNhanVien.*;
 
 public class QLKhachHang extends JPanel {
     private JTable tblKhachHang;
-    private JTextField txtMaKH, txtHoTen, txtEmail, txtSDT;
+    private JTextField txtMaKH, txtHoTen, txtEmail, txtSDT,txtDiaChi;
     private JButton btnFirst, btnPrev,btnNext,btnLast,btnMoi,btnXoa,btnSua,btnThem;
     public QLKhachHang(){
         setSize(986, 713);
         setLayout(null);
-        Font font= new Font("Arial",Font.PLAIN,14);
+        Font font= new Font("Arial",Font.BOLD,14);
 
         //Tiêu đề
         JLabel lblTitle = new JLabel("QUẢN LÝ KHÁCH HÀNG");
@@ -46,6 +46,11 @@ public class QLKhachHang extends JPanel {
         txtSDT = new JTextField();
         txtSDT.setBounds(20, 220, 330, 30);
 
+        JLabel lblDiaChi = new JLabel("Địa chỉ");
+        lblDiaChi.setBounds(20, 250, 100, 30);
+        txtDiaChi= new JTextField();
+        txtDiaChi.setBounds(20, 280, 330, 30);
+
         JPanel pnlBtn2 = new JPanel();
         pnlBtn2.setLayout(new GridLayout(1,4,10,10));
         pnlBtn2.setBounds(10,400,350,30);
@@ -58,11 +63,11 @@ public class QLKhachHang extends JPanel {
         pnlBtn2.add(btnNext);
         pnlBtn2.add(btnLast);
 
-        addCompoment(pnlCapNhat,lblMaKH,lblHoTen,lblEmail,lblSDT,pnlBtn2,
-                txtMaKH,txtHoTen,txtEmail,txtSDT);
+        addCompoment(pnlCapNhat,lblMaKH,lblHoTen,lblEmail,lblSDT,pnlBtn2,lblDiaChi,
+                txtMaKH,txtHoTen,txtEmail,txtSDT,txtDiaChi);
 
 
-        setFontForTextFields(font,lblMaKH,lblHoTen,lblEmail,lblSDT);
+
 
         //Buttons
         JPanel pnlBtn1 = new JPanel();
@@ -85,6 +90,11 @@ public class QLKhachHang extends JPanel {
 
         //tab danh sách
         JPanel pnlDanhSach = new JPanel(null);
+        JLabel lblTimKiem= new JLabel("Tìm kiếm:");
+        lblTimKiem.setBounds(10,10,100,30);
+        JTextField txtTimKiem= new JTextField();
+        txtTimKiem.setBounds(140,10,406,30);
+
         pnlDanhSach.setBounds(410,100,556,583);
         pnlDanhSach.setBorder(new LineBorder(Color.BLUE,1));
         tblKhachHang = new JTable(new DefaultTableModel(
@@ -98,8 +108,12 @@ public class QLKhachHang extends JPanel {
             }
         });
         JScrollPane scrollPane = new JScrollPane(tblKhachHang);
-        scrollPane.setBounds(10, 10, 536, 563);
+        scrollPane.setBounds(10, 50, 536, 523);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Danh sách khách hàng"));
         pnlDanhSach.add(scrollPane);
+        pnlDanhSach.add(txtTimKiem);
+        pnlDanhSach.add(lblTimKiem);
+        setFontForTextFields(font,lblMaKH,lblHoTen,lblEmail,lblSDT,lblTimKiem,lblDiaChi,lblTimKiem);
 
         add(pnlCapNhat);
         add(pnlBtn1);
