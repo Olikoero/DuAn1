@@ -4,8 +4,9 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import static org.view.QLNhanVien.addCompoment;
-import static org.view.QLNhanVien.setFontForTextFields;
+
+import static org.view.QLNhanVien.*;
+import static org.view.QLNhanVien.setBooleanProperty;
 
 public class QLHoaDon extends JPanel {
     private JTable tableHoaDon, tableChiTiet;
@@ -78,6 +79,11 @@ public class QLHoaDon extends JPanel {
         pnlTable.setBounds(20,280,946,403);
         pnlTable.setBorder(new LineBorder(Color.BLUE,1));
 
+        JLabel lblTimKiem= new JLabel("Tìm kiếm:");
+        lblTimKiem.setBounds(15,10,100,30);
+        JTextField txtTimKiem= new JTextField();
+        txtTimKiem.setBounds(100,10,455,30);
+
         tableHoaDon = new JTable(new DefaultTableModel( new Object[][]{},
                 new String[]{"Mã HD", "Mã KH", "Mã NV", "Ngày lập", "Tổng tiền"}
         ){
@@ -89,17 +95,25 @@ public class QLHoaDon extends JPanel {
         });
         JScrollPane scrollHoaDon = new JScrollPane(tableHoaDon);
         scrollHoaDon.setBorder(BorderFactory.createTitledBorder("Danh sách hóa đơn"));
-        scrollHoaDon.setBounds(10, 10, 555, 383);
+        scrollHoaDon.setBounds(10, 40, 555, 353);
 
         tableChiTiet = new JTable(new DefaultTableModel( new Object[][]{},
-                new String[]{"Mã SP", "Số lượng", "Thành tiền"}
-        ));
+                new String[]{"Tên SP", "Số lượng","Đơn giá", "Thành tiền"}
+        ){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Không cho phép chỉnh sửa bất kỳ ô nào
+                return false;
+            }
+        });
 
         JScrollPane scrollChiTiet = new JScrollPane(tableChiTiet);
         scrollChiTiet.setBorder(BorderFactory.createTitledBorder("Chi tiết hóa đơn"));
         scrollChiTiet.setBounds(575, 10, 351, 343);
         pnlTable.add(scrollHoaDon);
         pnlTable.add(scrollChiTiet);
+        pnlTable.add(lblTimKiem);
+        pnlTable.add(txtTimKiem);
 
         btnThemSP=new JButton("Thêm sản phẩm");
         btnThemSP.setBounds(590,363,150,30);
@@ -109,11 +123,17 @@ public class QLHoaDon extends JPanel {
         btnLuuHoaDon.setBounds(760,363,150,30);
         pnlTable.add(btnThemSP);
         pnlTable.add(btnLuuHoaDon);
-        setFontForTextFields(font,lblMaHD,lblMaKH,lblNgayLap,lblTongTien);
+        setFontForTextFields(font,lblMaHD,lblMaKH,lblNgayLap,lblTongTien,lblTimKiem);
+        AbstractButton[] btn={btnPrev,btnThemSP,btnLast,btnNext,btnLuuHoaDon,btnFirst,btnPrint,btnThem};
+        Color defaultBorderColor = Color.LIGHT_GRAY;
+        setComponentProperty(btn, c -> c.setBackground(defaultBorderColor) );
+        setBooleanProperty(btn, AbstractButton::setFocusPainted, false);
+        setBooleanProperty(btn, AbstractButton::setBorderPainted, false);
 
         add(lblTitle);
         add(panelTop);
         add(pnlTable);
+
     }
 
     public static void main(String[] args) {

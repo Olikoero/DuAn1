@@ -1,9 +1,15 @@
 package org.view;
 
+import org.DAO.ThongKeDAO;
+
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.text.DecimalFormat;
 
 import static org.view.QLNhanVien.addCompoment;
 import static org.view.QLNhanVien.setFontForTextFields;
@@ -105,13 +111,6 @@ public class ThongKe extends JPanel {
         scrollPaneBC.setBounds(10, 10, 926, 285);
         pnlBanChay.add(scrollPaneBC);
 
-        JPanel pnlTonKho = new JPanel(null);
-        tblTonKho = new JTable(new DefaultTableModel(
-                new Object[][]{}, new String[]{"TÊN SẢN PHẨM", "LOẠI SẢN PHẨM", "ĐÃ BÁN", "CÒN LẠI TRONG KHO"}
-        ));
-        JScrollPane scrollPaneTK = new JScrollPane(tblTonKho);
-        scrollPaneTK.setBounds(10, 10, 926, 285);
-        pnlTonKho.add(scrollPaneTK);
 
         JPanel pnlThanhTich = new JPanel(null);
         tblThanhTich = new JTable(new DefaultTableModel(
@@ -122,8 +121,7 @@ public class ThongKe extends JPanel {
         pnlThanhTich.add(scrollPaneTT);
 
         tabs.add(pnlDoanhThu, "Doanh thu theo tháng");
-        tabs.add(pnlBanChay, "Bán chạy");
-        tabs.add(pnlTonKho, "Tồn kho");
+        tabs.add(pnlBanChay, "Sản phẩm bán chạy");
         tabs.add(pnlThanhTich, "Thành tích nhân viên");
 
         add(lblDoanhThu);
@@ -131,13 +129,176 @@ public class ThongKe extends JPanel {
         add(lblBoLoc);
         add(pnlLoc);
         add(tabs);
+        fillCboNam();
+
+        cboNam.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    fillCboThang(); // Cập nhật cboThang dựa trên năm được chọn
+                    updateData();   // Cập nhật dữ liệu giao diện
+                }
+            }
+        });
+
+        // Thêm sự kiện cho cboThang để cập nhật dữ liệu
+        cboThang.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    updateData(); // Chỉ cập nhật dữ liệu khi thay đổi tháng
+                }
+            }
+        });
+
+        // Sự kiện cho nút "Xóa bộ lọc"
+        btnXoaLoc.addActionListener(e -> resetFilter());
+
+
     }
+    ThongKeDAO dao= new ThongKeDAO();
+
+    private void fillCboNam() {
+        try {
+            List<Integer> namList = dao.getDanhSachNam();
+            cboNam.removeAllItems();
+
+            for (int nam : namList) {
+                cboNam.addItem(String.valueOf(nam));
+            }
+
+            if (cboNam.getItemCount() > 0) {
+                cboNam.setSelectedIndex(0); // Chọn năm đầu tiên
+                fillCboThang();             // Điền cboThang cho năm đầu tiên
+                updateData();               // Cập nhật dữ liệu ban đầu
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải danh sách năm!");
+        }
+    }
+
+    // Điền danh sách tháng dựa trên năm được chọn
+    private void fillCboThang() {
+        try {
+            if (cboNam.getSelectedItem() != null) {
+                int nam = Integer.parseInt(cboNam.getSelectedItem().toString());
+                List<Integer> thangList = dao.getDanhSachThang(nam);
+                cboThang.removeAllItems();
+
+                for (int thang : thangList) {
+                    cboThang.addItem(String.valueOf(thang));
+                }
+
+                if (cboThang.getItemCount() > 0) {
+                    cboThang.setSelectedIndex(0); // Chọn tháng đầu tiên
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải danh sách tháng!");
+        }
+    }
+
 
     public static void highIcon(JLabel... labels) {
         for (JLabel label : labels) {
             label.setHorizontalTextPosition(SwingConstants.CENTER);
             label.setVerticalTextPosition(SwingConstants.BOTTOM);
         }
+    }
+    private void fillTableDoanhThu() {
+        DefaultTableModel model = (DefaultTableModel) tblDoanhThu.getModel();
+        model.setRowCount(0);
+        try {
+            int thang = Integer.parseInt(cboThang.getSelectedItem().toString());
+            int nam = Integer.parseInt(cboNam.getSelectedItem().toString());
+            List<Object[]> list = dao.getDoanhThuChiTiet(thang, nam); // Gọi đúng phương thức
+            for (Object[] row : list) {
+                model.addRow(row); // Thêm từng dòng dữ liệu vào bảng
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu doanh thu!");
+        }
+    }
+    private void capNhatDoanhThu() {
+        DecimalFormat df = new DecimalFormat("#,###.00");
+        try {
+            int thang = Integer.parseInt(cboThang.getSelectedItem().toString());
+            int nam = Integer.parseInt(cboNam.getSelectedItem().toString());
+
+            // Doanh thu tháng (chỉ trả về 1 cột: DoanhThuThang)
+            List<Object[]> dtThangList = dao.getDoanhThuThang(thang, nam);
+            double doanhThuThang = 0;
+            if (!dtThangList.isEmpty() && dtThangList.get(0).length >= 1) {
+                doanhThuThang = ((Number) dtThangList.get(0)[0]).doubleValue(); // Index 0 là DoanhThuThang
+            }
+            lblDoanhThuThang.setText("Tháng: " + df.format(doanhThuThang) + " VNĐ");
+
+            // Doanh thu năm (chỉ trả về 1 cột: DoanhThuNam)
+            List<Object[]> dtNamList = dao.getDoanhThuNam(nam);
+            double doanhThuNam = 0;
+            if (!dtNamList.isEmpty() && dtNamList.get(0).length >= 1) {
+                doanhThuNam = ((Number) dtNamList.get(0)[0]).doubleValue(); // Index 0 là DoanhThuNam
+            }
+            lblDoanhThuNam.setText("Năm: " + df.format(doanhThuNam) + " VNĐ");
+
+            // Doanh thu tổng (chỉ trả về 1 cột: DoanhThuTong)
+            List<Object[]> dtTongList = dao.getDoanhThuTong();
+            double doanhThuTong = 0;
+            if (!dtTongList.isEmpty() && dtTongList.get(0).length >= 1) {
+                doanhThuTong = ((Number) dtTongList.get(0)[0]).doubleValue(); // Index 0 là DoanhThuTong
+            }
+            lblDoanhThuTong.setText("Tổng: " + df.format(doanhThuTong) + " VNĐ");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật doanh thu: " + e.getMessage());
+        }
+    }
+    private void fillTableSanPhamBanChay() {
+        DefaultTableModel model = (DefaultTableModel) tblBanChay.getModel();
+        model.setRowCount(0);
+        try {
+            int thang = Integer.parseInt(cboThang.getSelectedItem().toString());
+            int nam = Integer.parseInt(cboNam.getSelectedItem().toString());
+            List<Object[]> list = dao.getSanPhamBanChay(thang, nam);
+            for (Object[] row : list) {
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu sản phẩm bán chạy!");
+        }
+    }
+    private void fillTableThanhTich() {
+        DefaultTableModel model = (DefaultTableModel) tblThanhTich.getModel();
+        model.setRowCount(0);
+        try {
+            int thang = Integer.parseInt(cboThang.getSelectedItem().toString());
+            int nam = Integer.parseInt(cboNam.getSelectedItem().toString());
+            List<Object[]> list = dao.getThanhTichNhanVien(thang, nam);
+            for (Object[] row : list) {
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu thành tích nhân viên!");
+        }
+    }
+    private void updateData() {
+        fillTableDoanhThu();
+        fillTableSanPhamBanChay();
+        fillTableThanhTich();
+        capNhatDoanhThu();
+    }
+    private void resetFilter() {
+        if (cboNam.getItemCount() > 0) {
+            cboNam.setSelectedIndex(0); // Reset về năm đầu tiên
+            fillCboThang();             // Cập nhật lại tháng
+        }
+        updateData();
     }
 
     public static void main(String[] args) {

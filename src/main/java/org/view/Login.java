@@ -111,21 +111,24 @@ public class Login extends JPanel {
             MsgBox.alert(this, "Sai tên đăng nhập!");
         } else if (!matKhau.equals(nv.getMatKhau())) {
             MsgBox.alert(this, "Sai mật khẩu!");
-        } else if (chkremember.isSelected()) {
-            prefs.put("username", manv);
-            prefs.put("password", matKhau);
-            prefs.putBoolean("remember", true);
-//            MsgBox.alert(this, "Đăng Nhập Thành Công!");
-            Auth.user = nv;
-            new MainScreen();
         } else {
-            prefs.remove("username");
-            prefs.remove("password");
-            prefs.remove("remember");
+            if (chkremember.isSelected()) {
+                prefs.put("username", manv);
+                prefs.put("password", matKhau);
+                prefs.putBoolean("remember", true);
+            } else {
+                prefs.remove("username");
+                prefs.remove("password");
+                prefs.remove("remember");
+            }
             Auth.user = nv;
-            new MainScreen();
+            // Lấy JFrame cha (LoginScreen) và đóng nó
+            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            if (frame != null) {
+                frame.dispose(); // Đóng LoginScreen
+            }
+            new MainScreen(); // Mở MainScreen
         }
-
     }
     private void showPanel(JPanel panel) {
         this.removeAll(); // Xóa nội dung cũ

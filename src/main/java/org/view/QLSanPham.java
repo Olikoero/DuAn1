@@ -20,8 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.text.ParseException;
 
-import static org.view.QLNhanVien.addCompoment;
-import static org.view.QLNhanVien.setFontForTextFields;
+import static org.view.QLNhanVien.*;
+import static org.view.QLNhanVien.setBooleanProperty;
 
 public class QLSanPham extends JPanel {
     private JTabbedPane tabs;
@@ -211,6 +211,11 @@ public class QLSanPham extends JPanel {
                 searchAndUpdateTable();
             }
         });
+        AbstractButton[] btn={btnPrev,btnLast,btnNext,btnFirst,btnThem,btnXoa,btnSua,btnMoi};
+        Color defaultBorderColor = Color.LIGHT_GRAY;
+        setComponentProperty(btn, c -> c.setBackground(defaultBorderColor) );
+        setBooleanProperty(btn, AbstractButton::setFocusPainted, false);
+        setBooleanProperty(btn, AbstractButton::setBorderPainted, false);
     }
 
     private void fillTable() {
@@ -315,16 +320,20 @@ public class QLSanPham extends JPanel {
         }
 
         Integer masp = (Integer) tblSanPham.getValueAt(selectedRow, 0);
+        if(!Auth.isManager()){
+            MsgBox.alert(this,"Bạn không có quyền xóa sản phẩm!");
+        }else {
 
-        if (JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa sản phẩm này?", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            try {
-                dao.delete(masp);
-                fillTable();  // Cập nhật lại bảng
-                moi();  // Làm mới form
-                JOptionPane.showMessageDialog(this, "Xóa sản phẩm thành công!");
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Lỗi xóa sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
+            if (JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa sản phẩm này?", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                try {
+                    dao.delete(masp);
+                    fillTable();  // Cập nhật lại bảng
+                    moi();  // Làm mới form
+                    JOptionPane.showMessageDialog(this, "Xóa sản phẩm thành công!");
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Lỗi xóa sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
+                }
             }
         }
     }
