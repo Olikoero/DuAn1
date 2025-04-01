@@ -3,20 +3,35 @@ package org.Entity;
 import java.util.Date;
 
 public class SanPham {
-    private String MaSP;
+    private int MaSP;
     private String TenSP;
-    private String Hinh;
-    private double Gia;
+    private String Anh;
+    private double GiaNhap;
+    private double GiaBan;
     private int SoLuong;
     private Date NgayNhap;
-    private boolean TrangThai;
-    private String TinhTrang;
+    private String GhiChu;
 
-    public String getMaSP() {
+    public SanPham(int maSP, String tenSP, String anh, double giaNhap, double giaBan, int soLuong, Date ngayNhap, String ghiChu) {
+        MaSP = maSP;
+        TenSP = tenSP;
+        Anh = anh;
+        GiaNhap = giaNhap;
+        GiaBan = giaBan;
+        SoLuong = soLuong;
+        NgayNhap = ngayNhap;
+        GhiChu = ghiChu;
+    }
+
+    public SanPham() {
+
+    }
+
+    public int getMaSP() {
         return MaSP;
     }
 
-    public void setMaSP(String maSP) {
+    public void setMaSP(int maSP) {
         MaSP = maSP;
     }
 
@@ -28,20 +43,28 @@ public class SanPham {
         TenSP = tenSP;
     }
 
-    public String getHinh() {
-        return Hinh;
+    public String getAnh() {
+        return Anh;
     }
 
-    public void setHinh(String hinh) {
-        Hinh = hinh;
+    public void setAnh(String anh) {
+        Anh = anh;
     }
 
-    public double getGia() {
-        return Gia;
+    public double getGiaNhap() {
+        return GiaNhap;
     }
 
-    public void setGia(double gia) {
-        Gia = gia;
+    public void setGiaNhap(double giaNhap) {
+        GiaNhap = giaNhap;
+    }
+
+    public double getGiaBan() {
+        return GiaBan;
+    }
+
+    public void setGiaBan(double giaBan) {
+        GiaBan = giaBan;
     }
 
     public int getSoLuong() {
@@ -60,19 +83,11 @@ public class SanPham {
         NgayNhap = ngayNhap;
     }
 
-    public boolean isTrangThai() {
-        return TrangThai;
+    public String getGhiChu() {
+        return GhiChu;
     }
 
-    public void setTrangThai(boolean trangThai) {
-        TrangThai = trangThai;
-    }
-
-    public String getTinhTrang() {
-        return TinhTrang;
-    }
-
-    public void setTinhTrang(String tinhTrang) {
-        TinhTrang = tinhTrang;
+    public void setGhiChu(String ghiChu) {
+        GhiChu = ghiChu;
     }
 }

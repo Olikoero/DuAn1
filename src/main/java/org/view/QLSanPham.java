@@ -1,28 +1,58 @@
 package org.view;
 
+import org.DAO.SanPhamDAO;
+import org.Entity.SanPham;
+import org.util.Auth;
+import org.util.MsgBox;
+import org.util.XImage;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.text.ParseException;
 
 import static org.view.QLNhanVien.addCompoment;
 import static org.view.QLNhanVien.setFontForTextFields;
 
 public class QLSanPham extends JPanel {
+    private JTabbedPane tabs;
     private JLabel lblAnh;
     private JTable tblSanPham;
     private JTextArea txtGhiChu;
     private JTextField txtMaSP, txtSL, txtTenSP, txtGiaBan, txtGiaNhap, txtNgayNhap, txtTimKiem;
     private JFileChooser fileChooser;
     private JButton btnMoi, btnXoa, btnSua, btnThem, btnFirst, btnPrev, btnNext, btnLast;
+    private DefaultTableModel model;
+    private int currentRow = -1;
+
+    SanPhamDAO dao = new SanPhamDAO();
+
+    private Integer getMaSPFromSelectedRow() {
+        int selectedRow = tblSanPham.getSelectedRow();
+        if (selectedRow >= 0) {
+            return (Integer) tblSanPham.getValueAt(selectedRow, 0);
+        }
+        return -1;
+    }
+
+    int row = -1;
 
     public QLSanPham() {
         setSize(986, 713);
         setLayout(null);
 
-        Font font= new Font("Arial",Font.BOLD,14);
+        Font font = new Font("Arial", Font.BOLD, 14);
 
-        JLabel lblTitle = new JLabel("QUẢN LÝ SẢN PHẦM");
+        JLabel lblTitle = new JLabel("QUẢN LÝ SẢN PHẨM");
         lblTitle.setFont(lblTitle.getFont().deriveFont(30f));
         lblTitle.setForeground(Color.BLUE);
         lblTitle.setBounds(50, 15, 500, 30);
@@ -35,6 +65,7 @@ public class QLSanPham extends JPanel {
         lblMaSP.setBounds(10, 10, 100, 30);
         txtMaSP = new JTextField();
         txtMaSP.setBounds(10, 40, 200, 30);
+        txtMaSP.setEditable(false); // Disable editing for MaSP
 
         JLabel lblTenSP = new JLabel("Tên SP");
         lblTenSP.setBounds(10, 70, 100, 30);
@@ -67,14 +98,18 @@ public class QLSanPham extends JPanel {
         txtGhiChu.setBorder(new LineBorder(Color.BLACK, 1));
         txtGhiChu.setBounds(250, 160, 200, 90);
 
-
         JLabel lblHinh = new JLabel("Hình ảnh");
         lblHinh.setBounds(490, 10, 100, 30);
 
         lblAnh = new JLabel();
         lblAnh.setBounds(490, 40, 210, 260);
         lblAnh.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
+        lblAnh.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                chonAnh();
+            }
+        });
         fileChooser = new JFileChooser();
 
         JPanel pnlBtn1 = new JPanel();
@@ -107,8 +142,6 @@ public class QLSanPham extends JPanel {
         //danhsach
         JPanel pnlDanhSach = new JPanel(null);
 
-
-
         JLabel lblTimKiem = new JLabel("Tìm kiếm:");
         lblTimKiem.setBounds(20, 10, 100, 30);
         txtTimKiem = new JTextField();
@@ -116,28 +149,349 @@ public class QLSanPham extends JPanel {
         pnlDanhSach.setBorder(new LineBorder(Color.BLUE, 1));
         pnlDanhSach.setBounds(20, 390, 946, 300);
         pnlDanhSach.setBorder(new LineBorder(Color.BLUE, 1));
-        tblSanPham = new JTable(new DefaultTableModel(
+        model = new DefaultTableModel(
                 new Object[][]{},
                 new String[]{"MÃ SP", "TÊN SP", "SỐ LƯỢNG", "GIÁ NHẬP", "GIÁ BÁN", "NGÀY NHẬP", "ẢNH"}
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // Không cho phép chỉnh sửa bất kỳ ô nào
                 return false;
             }
-        });
+        };
+        tblSanPham = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(tblSanPham);
         scrollPane.setBounds(10, 40, 926, 250);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Danh sách sản phẩm"));
         pnlDanhSach.add(scrollPane);
         pnlDanhSach.add(lblTimKiem);
         pnlDanhSach.add(txtTimKiem);
-        setFontForTextFields(font,lblMaSP,lblTenSP,lblSL,lblGiaNhap,lblGiaBan,lblNgayNhap,lblGhiChu,lblHinh,lblTimKiem);
+        setFontForTextFields(font, lblMaSP, lblTenSP, lblSL, lblGiaNhap, lblGiaBan, lblNgayNhap, lblGhiChu, lblHinh, lblTimKiem);
 
         add(lblTitle);
         add(pnlCapNhat);
         add(pnlDanhSach);
 
+        btnThem.addActionListener(e -> them());
+        btnSua.addActionListener(e -> sua());
+        btnXoa.addActionListener(e -> xoa());
+        btnMoi.addActionListener(e -> moi());
+        btnFirst.addActionListener(e -> first());
+        btnPrev.addActionListener(e -> prev());
+        btnNext.addActionListener(e -> next());
+        btnLast.addActionListener(e -> last());
+
+        tblSanPham.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    row = tblSanPham.getSelectedRow();
+                    if (row >= 0) {
+                        edit();
+                    }
+                }
+            }
+        });
+
+        fillTable();
+        updateStatus();
+
+        txtTimKiem.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                searchAndUpdateTable();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                searchAndUpdateTable();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                searchAndUpdateTable();
+            }
+        });
+    }
+
+    private void fillTable() {
+        model.setRowCount(0);
+
+        try {
+            List<SanPham> list = dao.selectAll();
+            if (list.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Không có sản phẩm nào để hiển thị!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+            for (SanPham sp : list) {
+                Object[] row = {
+                        sp.getMaSP(),
+                        sp.getTenSP(),
+                        sp.getSoLuong(),
+                        sp.getGiaNhap(),
+                        sp.getGiaBan(),
+                        sp.getNgayNhap() != null ? sdf.format(sp.getNgayNhap()) : "",
+                        sp.getAnh()
+                };
+                model.addRow(row); // Thêm dữ liệu mới vào bảng
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi truy vấn dữ liệu sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    private boolean validateFields() {
+        return !txtTenSP.getText().isEmpty() &&
+                validateNumber(txtSL.getText(), "Số lượng") &&
+                validateNumber(txtGiaNhap.getText(), "Giá nhập") &&
+                validateNumber(txtGiaBan.getText(), "Giá bán") &&
+                validateDate(txtNgayNhap.getText());
+    }
+
+    private boolean validateNumber(String value, String fieldName) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, fieldName + " phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
+    private boolean validateDate(String dateStr) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        sdf.setLenient(false);
+        try {
+            Date date = sdf.parse(dateStr);
+            return true;
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(this, "Ngày nhập không hợp lệ! Định dạng đúng: dd/MM/yyyy", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
+    private SanPham getForm() throws ParseException {
+
+        SanPham sp = new SanPham();
+
+        sp.setTenSP(txtTenSP.getText());
+        sp.setSoLuong(Integer.parseInt(txtSL.getText()));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        sp.setNgayNhap(sdf.parse(txtNgayNhap.getText()));
+
+        sp.setGiaNhap(Double.parseDouble(txtGiaNhap.getText()));
+        sp.setGiaBan(Double.parseDouble(txtGiaBan.getText()));
+        sp.setGhiChu(txtGhiChu.getText());
+        sp.setAnh(lblAnh.getToolTipText());
+
+        return sp;
+    }
+
+    private void them() {
+        if (!validateFields()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            SanPham sp = getForm();
+            dao.insert(sp);
+            fillTable();
+            moi();
+            JOptionPane.showMessageDialog(this, "Thêm sản phẩm thành công!");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi thêm sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    private void xoa() {
+        int selectedRow = tblSanPham.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm để xóa!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Integer masp = (Integer) tblSanPham.getValueAt(selectedRow, 0);
+
+        if (JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa sản phẩm này?", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            try {
+                dao.delete(masp);
+                fillTable();  // Cập nhật lại bảng
+                moi();  // Làm mới form
+                JOptionPane.showMessageDialog(this, "Xóa sản phẩm thành công!");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Lỗi xóa sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void sua() {
+        if (!validateFields()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        int selectedRow = tblSanPham.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm để cập nhật!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            SanPham sp = getForm();
+            sp.setMaSP((Integer) tblSanPham.getValueAt(selectedRow, 0));
+            dao.update(sp);
+            fillTable();
+            JOptionPane.showMessageDialog(this, "Cập nhật sản phẩm thành công!");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi cập nhật sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    private void moi() {
+        txtMaSP.setText("");
+        txtTenSP.setText("");
+        txtSL.setText("");
+        txtGiaNhap.setText("");
+        txtGiaBan.setText("");
+        txtNgayNhap.setText("");
+        txtGhiChu.setText("");
+        lblAnh.setIcon(null);
+        lblAnh.setToolTipText(null);
+        this.row = -1;
+        updateStatus();
+    }
+
+    private void chonAnh() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        int returnValue = fileChooser.showOpenDialog(this);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            ImageIcon icon = new ImageIcon(new ImageIcon(selectedFile.getAbsolutePath()).getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH));
+            lblAnh.setIcon(icon);
+            lblAnh.setToolTipText(selectedFile.getName()); // Lưu tên file
+        }
+    }
+
+    private void searchAndUpdateTable() {
+        String keyword = txtTimKiem.getText().trim();
+        try {
+            List<SanPham> list = dao.search(keyword);
+            model.setRowCount(0);
+
+            if (list.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Không có sản phẩm nào phù hợp!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                for (SanPham sp : list) {
+                    Object[] row = {
+                            sp.getMaSP(),
+                            sp.getTenSP(),
+                            sp.getSoLuong(),
+                            sp.getGiaNhap(),
+                            sp.getGiaBan(),
+                            sp.getNgayNhap() != null ? sdf.format(sp.getNgayNhap()) : "",
+                            sp.getAnh()
+                    };
+                    model.addRow(row);
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi tìm kiếm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    void setForm(SanPham sp) {
+        txtMaSP.setText(String.valueOf(sp.getMaSP()));
+        txtTenSP.setText(sp.getTenSP());
+        txtSL.setText(String.valueOf(sp.getSoLuong()));
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        txtNgayNhap.setText(sp.getNgayNhap() != null ? sdf.format(sp.getNgayNhap()) : "");
+        txtGiaNhap.setText(String.valueOf(sp.getGiaNhap()));
+        txtGiaBan.setText(String.valueOf(sp.getGiaBan()));
+        txtGhiChu.setText(sp.getGhiChu());
+        if (sp.getAnh() != null) {
+            lblAnh.setToolTipText(sp.getAnh());
+            lblAnh.setIcon(XImage.read(sp.getAnh()));
+        } else {
+            lblAnh.setIcon(null);
+            lblAnh.setToolTipText(null);
+        }
+    }
+
+    private void clearForm() {
+        txtMaSP.setText("");
+        txtTenSP.setText("");
+        txtSL.setText("");
+        txtGiaNhap.setText("");
+        txtGiaBan.setText("");
+        txtNgayNhap.setText("");
+        txtGhiChu.setText("");
+        lblAnh.setIcon(null);
+        lblAnh.setToolTipText("");
+
+        this.row = -1;
+        this.updateStatus();
+    }
+
+    void edit() {
+        int masp = (Integer) tblSanPham.getValueAt(this.row, 0);
+        SanPham sp = dao.selectByID(masp);
+        this.setForm(sp);
+        updateStatus();
+    }
+
+    void first() {
+        if (tblSanPham.getRowCount() > 0) {
+            row = 0;
+            tblSanPham.setRowSelectionInterval(row, row);
+            edit();
+        }
+    }
+
+    void prev() {
+        if (row > 0) {
+            row--;
+            tblSanPham.setRowSelectionInterval(row, row);
+            edit();
+        }
+    }
+
+    void next() {
+        if (row < tblSanPham.getRowCount() - 1) {
+            row++;
+            tblSanPham.setRowSelectionInterval(row, row);
+            edit();
+        }
+    }
+
+    void last() {
+        if (tblSanPham.getRowCount() > 0) {
+            row = tblSanPham.getRowCount() - 1;
+            tblSanPham.setRowSelectionInterval(row, row);
+            edit();
+        }
+    }
+
+    void updateStatus() {
+        boolean edit = (this.row >= 0);
+        boolean first = (this.row == 0);
+        boolean last = (this.row == tblSanPham.getRowCount() - 1);
+
+        txtMaSP.setEditable(!edit);
+        btnThem.setEnabled(!edit);
+        btnSua.setEnabled(edit);
+        btnXoa.setEnabled(edit);
+
+        btnFirst.setEnabled(tblSanPham.getRowCount() > 0 && !first);
+        btnPrev.setEnabled(tblSanPham.getRowCount() > 0 && !first);
+        btnNext.setEnabled(tblSanPham.getRowCount() > 0 && !last);
+        btnLast.setEnabled(tblSanPham.getRowCount() > 0 && !last);
     }
 
     public static void main(String[] args) {
