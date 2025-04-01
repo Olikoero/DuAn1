@@ -16,7 +16,7 @@ public class ChangePass extends JPanel {
     private JPasswordField txtMatKhau, txtMatKhau1, txtMatKhau2;
     private JButton btnDongY, btnHuyBo;
     private Image backgroundImage;
-/// ////aaaaaaaaa
+/// ////aaaaaaaaajjjjj
     public ChangePass() {
         setSize(986, 713);
         setLayout(null);
