@@ -1,9 +1,24 @@
 package org.view;
 
+import org.DAO.ChiTietHoaDonDAO;
+import org.DAO.HoaDonDAO;
+import org.Entity.CTHD;
+import org.Entity.HoaDon;
+import org.Entity.KhachHang;
+import org.util.Auth;
+import org.util.MsgBox;
+import org.util.XDate;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Date;
+import java.util.List;
 
 import static org.view.QLNhanVien.*;
 import static org.view.QLNhanVien.setBooleanProperty;
@@ -11,7 +26,7 @@ import static org.view.QLNhanVien.setBooleanProperty;
 public class QLHoaDon extends JPanel {
     private JTable tableHoaDon, tableChiTiet;
     private JTextField txtMaHD, txtMaKH, txtNgayLap, txtTongTien;
-    private JButton btnThem, btnPrint, btnPrev, btnNext, btnLast, btnFirst, btnThemSP, btnLuuHoaDon;
+    private JButton btnThem,btnMoi, btnPrint, btnPrev, btnNext, btnLast, btnFirst, btnThemSP, btnLuuHoaDon;
 
     public QLHoaDon() {
         setLayout(null);
@@ -42,7 +57,7 @@ public class QLHoaDon extends JPanel {
         txtMaKH.setBounds(20, 100, 250, 30);
 
         JLabel lblNgayLap = new JLabel("Ngày lập:");
-        txtNgayLap = new JTextField();
+        txtNgayLap = new JTextField(XDate.toString(getCurrentDate(),"dd/MM/yyyy"));
         lblNgayLap.setBounds(330, 10, 100, 30);
         txtNgayLap.setBounds(330, 40, 250, 30);
 
@@ -52,12 +67,14 @@ public class QLHoaDon extends JPanel {
         txtTongTien.setBounds(330, 100, 250, 30);
 
         JPanel pnlBtn1 = new JPanel();
-        pnlBtn1.setLayout(new GridLayout(2,1,10,30));
-        pnlBtn1.setBounds(650,40,250,120);
+        pnlBtn1.setLayout(new GridLayout(3,1,10,10));
+        pnlBtn1.setBounds(650,30,250,140);
         btnPrint = new JButton(new ImageIcon("img/save.png"));
         btnThem = new JButton(new ImageIcon("img/add.png"));
+        btnMoi = new JButton(new ImageIcon("img/new.png"));
         pnlBtn1.add(btnThem);
         pnlBtn1.add(btnPrint);
+        pnlBtn1.add(btnMoi);
 
 
         JPanel pnlBtn2 = new JPanel();
@@ -124,7 +141,7 @@ public class QLHoaDon extends JPanel {
         pnlTable.add(btnThemSP);
         pnlTable.add(btnLuuHoaDon);
         setFontForTextFields(font,lblMaHD,lblMaKH,lblNgayLap,lblTongTien,lblTimKiem);
-        AbstractButton[] btn={btnPrev,btnThemSP,btnLast,btnNext,btnLuuHoaDon,btnFirst,btnPrint,btnThem};
+        AbstractButton[] btn={btnPrev,btnThemSP,btnLast,btnNext,btnLuuHoaDon,btnFirst,btnPrint,btnThem,btnMoi};
         Color defaultBorderColor = Color.LIGHT_GRAY;
         setComponentProperty(btn, c -> c.setBackground(defaultBorderColor) );
         setBooleanProperty(btn, AbstractButton::setFocusPainted, false);
@@ -133,7 +150,142 @@ public class QLHoaDon extends JPanel {
         add(lblTitle);
         add(panelTop);
         add(pnlTable);
+        this.fillTable();
+        this.row=-1;
+        this.updateStatus();
+        btnThem.addActionListener(e -> insert());
+        btnMoi.addActionListener(e -> clearForm());
+        btnFirst.addActionListener(e -> first());
+        btnPrev.addActionListener(e -> prev());
+        btnNext.addActionListener(e -> next());
+        btnLast.addActionListener(e -> last());
+        tableHoaDon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    row = tableHoaDon.getSelectedRow();
+                    edit();
+                }
+            }
+        });
 
+    }
+    int row=-1;
+    HoaDonDAO hdDAO= new HoaDonDAO();
+    ChiTietHoaDonDAO ctDAO= new ChiTietHoaDonDAO();
+
+    void insert(){
+        HoaDon hd= getForm();
+
+        try {
+            hdDAO.insert(hd);this.fillTable();this.clearForm();
+            MsgBox.alert(this, "Tạo hóa đơn thành công");
+        } catch (Exception e) {
+            MsgBox.alert(this, "Tạo hóa đơn thất bại");
+        }
+    }
+
+
+    void clearForm(){
+        HoaDon hd=new HoaDon();
+        setForm(hd);
+        this.row=-1;
+        this.updateStatus();
+        fillTableChiTiet();
+    }
+    void edit(){
+        String maHD=(String) tableHoaDon.getValueAt(this.row,0);
+        HoaDon hd=hdDAO.selectByID(maHD);
+        this.setForm(hd);
+        this.updateStatus();
+        fillTableChiTiet();
+    }
+    void first(){
+        this.row=0;
+        this.edit();
+    }
+    void prev(){
+        if(this.row>0){
+            this.row--;
+            this.edit();
+        }
+    }
+    void next(){
+        if(this.row < tableHoaDon.getRowCount()-1){
+            this.row++;
+            this.edit();
+        }
+    }
+    void last(){
+        this.row = tableHoaDon.getRowCount()-1;
+        this.edit();
+    }
+    void fillTable(){
+        DefaultTableModel model = (DefaultTableModel) tableHoaDon.getModel();
+        model.setRowCount(0);
+        try {
+            List<HoaDon> list = hdDAO.selectAll();
+            for (HoaDon hd:list){
+                Object[] row =  {hd.getMaHD(),hd.getMaKH(), hd.getMaNV(),
+                        XDate.toString(hd.getNgayLap(),"dd/MM/yyyy"),hd.getTongTien()};
+                model.addRow(row);
+            }
+
+        }catch (Exception e){
+            MsgBox.alert(this,"Lỗi truy vấn dữ liệu");
+        }
+    }
+    void fillTableChiTiet(){
+        DefaultTableModel model = (DefaultTableModel) tableChiTiet.getModel();
+        model.setRowCount(0);
+        try {
+            List<CTHD> list = ctDAO.selectByMaHD(txtMaHD.getText());
+            for (CTHD ct:list){
+                Object[] row =  {ct.getTenSP(),ct.getSoLuong(), ct.getGiaBan(),
+                        ct.getThanhTien()};
+                model.addRow(row);
+            }
+
+        }catch (Exception e){
+            MsgBox.alert(this,"Lỗi truy vấn dữ liệu");
+        }
+    }
+    void setForm(HoaDon hd){
+        txtMaHD.setText(hd.getMaHD());
+        txtMaKH.setText(hd.getMaKH());
+        if(hd.getNgayLap()==null){
+            hd.setNgayLap(getCurrentDate());
+            txtNgayLap.setText(XDate.toString(getCurrentDate(),"dd/MM/yyyy"));
+        }else {
+            txtNgayLap.setText(XDate.toString(hd.getNgayLap(), "dd/MM/yyyy"));
+        }
+        txtTongTien.setText(String.valueOf(hd.getTongTien()));
+    }
+    HoaDon getForm(){
+        HoaDon hd= new HoaDon();
+        hd.setMaHD((txtMaHD.getText()));
+        hd.setMaKH((txtMaKH.getText()));
+        hd.setMaNV((Auth.user.getMaNv()));
+        hd.setNgayLap(XDate.toDate(txtNgayLap.getText(),"dd/MM/yyyy"));
+        hd.setTongTien(Double.parseDouble(txtTongTien.getText()));
+        return hd;
+    }
+    void updateStatus(){
+        boolean edit=(this.row>=0);
+        boolean first=(this.row==0);
+        boolean last=(this.row==tableHoaDon.getRowCount()-1);
+        txtMaHD.setEditable(!edit);
+        txtNgayLap.setEditable(false);
+        btnThem.setEnabled(!edit);
+        btnPrint.setEnabled(edit);
+        btnFirst.setEnabled(edit && !first);
+        btnPrev.setEnabled(edit && !first);
+        btnNext.setEnabled(edit && !last);
+        btnLast.setEnabled(edit && !last);
+    }
+
+    public Date getCurrentDate() {
+        return new Date();
     }
 
     public static void main(String[] args) {

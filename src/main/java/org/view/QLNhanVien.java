@@ -1,9 +1,17 @@
 package org.view;
 
+import org.DAO.NhanVienDAO;
+import org.Entity.NhanVien;
+import org.util.Auth;
+import org.util.MsgBox;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -53,15 +61,19 @@ public class QLNhanVien extends JPanel {
 
         JLabel lblEmail = new JLabel("Địa chỉ Email");
         lblEmail.setBounds(20, 250, 170, 30);
-        txtEmail = new JPasswordField();
+        txtEmail = new JTextField();
         txtEmail.setBounds(20, 280, 330, 30);
 
         JLabel lblVaiTro = new JLabel("Vai trò");
         lblVaiTro.setBounds(20, 310, 100, 30);
-        rdoTruongPhong = new JRadioButton("Trưởng phòng");
+        rdoTruongPhong = new JRadioButton("Quản lý");
         rdoTruongPhong.setBounds(20, 340, 150, 30);
         rdoNhanVien = new JRadioButton("Nhân viên");
         rdoNhanVien.setBounds(200, 340, 150, 30);
+
+        ButtonGroup vaitro=new ButtonGroup();
+        vaitro.add(rdoTruongPhong);
+        vaitro.add(rdoNhanVien);
 
 
         JPanel pnlBtn2 = new JPanel();
@@ -125,6 +137,27 @@ public class QLNhanVien extends JPanel {
         add(pnlDanhSach);
         add(lblTitle);
         setVisible(true);
+        rdoNhanVien.setSelected(true);
+        this.fillTable();
+        this.row=-1;
+        this.updateStatus();
+        btnThem.addActionListener(e -> insert());
+        btnSua.addActionListener(e -> update());
+        btnXoa.addActionListener(e -> delete());
+        btnMoi.addActionListener(e -> clearForm());
+        btnFirst.addActionListener(e -> first());
+        btnPrev.addActionListener(e -> prev());
+        btnNext.addActionListener(e -> next());
+        btnLast.addActionListener(e -> last());
+        tblNhanVien.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    row = tblNhanVien.getSelectedRow();
+                    edit();
+                }
+            }
+        });
     }
 
     public static void setFontForTextFields(Font font, JComponent... fields) {
@@ -146,6 +179,135 @@ public class QLNhanVien extends JPanel {
         for (JComponent component : components) {
             setter.accept(component); // Gọi phương thức setter
         }
+    }
+
+    NhanVienDAO dao = new NhanVienDAO();
+    int row=-1;
+    private void tblNhanVienMouclick(java.awt.event.MouseEvent evt){
+        if(evt.getClickCount()==2){
+            this.row = tblNhanVien.getSelectedRow();
+            this.edit();
+        }
+    }
+    void insert(){
+        NhanVien nv= getForm();
+        String mk2= new String(txtMatKhau2.getPassword());
+        if(!mk2.equals(nv.getMatKhau())){
+            MsgBox.alert(this,"Xác nhận mật khẩu không đúng");
+        }else{
+            try {
+                dao.insert(nv);this.fillTable();this.clearForm();
+                MsgBox.alert(this, "Thêm mới thành công");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Thêm mới thất bại");
+            }
+        }
+    }
+    void update(){
+        NhanVien nv= getForm();
+        String mk2= new String(txtMatKhau2.getPassword());
+        if(!mk2.equals(nv.getMatKhau())){
+            MsgBox.alert(this,"Xác nhận mật khẩu không đúng");
+        }else{
+            try {
+                dao.update(nv);this.fillTable();
+                MsgBox.alert(this, "Cập nhật thành công");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Cập nhật thất bại");
+            }
+        }
+    }
+    void delete(){
+            String manv=txtMaNV.getText();
+            if(manv.equals(Auth.user.getMaNv())){
+                MsgBox.alert(this, "Bạn không được xoá chính mình");
+            } else if(MsgBox.confirm(this, "Xác nhận xoá?")){
+                try {
+                    dao.delete(manv); fillTable();clearForm();
+                    MsgBox.alert(this, "Xoá thành công!");
+                } catch (Exception e) {
+                    MsgBox.alert(this, "Xoá thất bại!");
+                }
+            }
+    }
+    void clearForm(){
+        NhanVien nv=new NhanVien();
+        this.setForm(nv);
+        this.row=-1;
+        this.updateStatus();
+    }
+    void edit(){
+        String manv=(String) tblNhanVien.getValueAt(this.row,0);
+        NhanVien nv=dao.selectByID(manv);
+        this.setForm(nv);
+        this.updateStatus();
+    }
+    void first(){
+        this.row=0;
+        this.edit();
+    }
+    void prev(){
+        if(this.row>0){
+            this.row--;
+            this.edit();
+        }
+    }
+    void next(){
+        if(this.row < tblNhanVien.getRowCount()-1){
+            this.row++;
+            this.edit();
+        }
+    }
+    void last(){
+        this.row = tblNhanVien.getRowCount()-1;
+        this.edit();
+    }
+    void fillTable(){
+        DefaultTableModel model = (DefaultTableModel) tblNhanVien.getModel();
+        model.setRowCount(0);
+        try {
+            List<NhanVien> list = dao.selectAll();
+            for (NhanVien nv:list){
+                String maskedPassword = "*".repeat(nv.getMatKhau().length());
+                Object[] row =  {nv.getMaNv(),maskedPassword, nv.getHoVaTen(),
+                        nv.isVaiTro()?"Quản lý":"Nhân Viên",nv.getEmail()};
+                model.addRow(row);
+            }
+
+        }catch (Exception e){
+            MsgBox.alert(this,"Lỗi truy vấn dữ liệu");
+        }
+    }
+    void setForm(NhanVien nv){
+        txtMaNV.setText(nv.getMaNv());
+        txtHoTen.setText(nv.getHoVaTen());
+        txtMatKhau.setText(nv.getMatKhau());
+        txtMatKhau2.setText(nv.getMatKhau());
+        rdoTruongPhong.setSelected(nv.isVaiTro());
+        rdoNhanVien.setSelected(!nv.isVaiTro());
+        txtEmail.setText(nv.getEmail());
+    }
+    NhanVien getForm(){
+        NhanVien nv= new NhanVien();
+        nv.setMaNv((txtMaNV.getText()));
+        nv.setHoVaTen((txtHoTen.getText()));
+        nv.setMatKhau((txtMatKhau.getText()));
+        nv.setVaiTro(rdoTruongPhong.isSelected());
+        nv.setEmail(txtEmail.getText());
+        return nv;
+    }
+    void updateStatus(){
+        boolean edit=(this.row>=0);
+        boolean first=(this.row==0);
+        boolean last=(this.row==tblNhanVien.getRowCount()-1);
+        txtMaNV.setEditable(!edit);
+        btnThem.setEnabled(!edit);
+        btnSua.setEnabled(edit);
+        btnXoa.setEnabled(edit);
+        btnFirst.setEnabled(edit && !first);
+        btnPrev.setEnabled(edit && !first);
+        btnNext.setEnabled(edit && !last);
+        btnLast.setEnabled(edit && !last);
     }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

@@ -12,6 +12,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -32,17 +34,8 @@ public class QLSanPham extends JPanel {
     private JFileChooser fileChooser;
     private JButton btnMoi, btnXoa, btnSua, btnThem, btnFirst, btnPrev, btnNext, btnLast;
     private DefaultTableModel model;
-    private int currentRow = -1;
 
     SanPhamDAO dao = new SanPhamDAO();
-
-    private Integer getMaSPFromSelectedRow() {
-        int selectedRow = tblSanPham.getSelectedRow();
-        if (selectedRow >= 0) {
-            return (Integer) tblSanPham.getValueAt(selectedRow, 0);
-        }
-        return -1;
-    }
 
     int row = -1;
 
@@ -89,7 +82,8 @@ public class QLSanPham extends JPanel {
 
         JLabel lblNgayNhap = new JLabel("Ngày nhập");
         lblNgayNhap.setBounds(250, 70, 100, 30);
-        txtNgayNhap = new JTextField();
+        txtNgayNhap = new JTextField("Ngày/Tháng/Năm");
+        txtNgayNhap.setForeground(Color.GRAY);
         txtNgayNhap.setBounds(250, 100, 200, 30);
 
         JLabel lblGhiChu = new JLabel("Ghi chú");
@@ -216,6 +210,23 @@ public class QLSanPham extends JPanel {
         setComponentProperty(btn, c -> c.setBackground(defaultBorderColor) );
         setBooleanProperty(btn, AbstractButton::setFocusPainted, false);
         setBooleanProperty(btn, AbstractButton::setBorderPainted, false);
+        txtNgayNhap.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (txtNgayNhap.getText().equals("Ngày/Tháng/Năm")) {
+                    txtNgayNhap.setText("");
+                    txtNgayNhap.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (txtNgayNhap.getText().isEmpty()) {
+                    txtNgayNhap.setForeground(Color.GRAY);
+                    txtNgayNhap.setText("Ngày/Tháng/Năm");
+                }
+            }
+        });
     }
 
     private void fillTable() {
