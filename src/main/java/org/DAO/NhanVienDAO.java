@@ -6,6 +6,7 @@ package org.DAO;/*
 
 import org.DAO.DuAnDAO;
 import org.Entity.NhanVien;
+import org.Entity.SanPham;
 import org.util.JDBCHelper;
 
 import java.sql.Connection;
@@ -98,5 +99,13 @@ public class NhanVienDAO extends DuAnDAO<NhanVien, String> {
             throw new RuntimeException(e);
         }
         return listNhanVien;
+    }
+    public List<NhanVien> search(String keyword) {
+        String sql = "SELECT * FROM nhanvien WHERE "
+                + "manv LIKE ? OR "
+                + "tennv LIKE ? OR "
+                + "email LIKE ?";
+        return this.selectBySql(sql, "%" + keyword + "%", "%" + keyword + "%", "%"
+                + keyword + "%");
     }
 }

@@ -1,5 +1,11 @@
 package org.view;
 
+import org.DAO.NhanVienDAO;
+import org.Entity.NhanVien;
+import org.Entity.SanPham;
+import org.util.Auth;
+import org.util.MsgBox;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
@@ -9,6 +15,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -22,8 +30,6 @@ public class QLNhanVien extends JPanel {
     private JButton btnThem, btnSua, btnXoa, btnMoi,
             btnFirst, btnPrev, btnNext, btnLast;
     private DefaultTableModel tableModel;
-    private int row = -1;
-
 
     public QLNhanVien() {
         setSize(986, 713);
@@ -70,7 +76,7 @@ public class QLNhanVien extends JPanel {
 
         JLabel lblVaiTro = new JLabel("Vai trò");
         lblVaiTro.setBounds(20, 310, 100, 30);
-        rdoTruongPhong = new JRadioButton("Trưởng phòng");
+        rdoTruongPhong = new JRadioButton("Quản lý");
         rdoTruongPhong.setBounds(20, 340, 150, 30);
         rdoNhanVien = new JRadioButton("Nhân viên");
         rdoNhanVien.setBounds(200, 340, 150, 30);
@@ -149,193 +155,186 @@ public class QLNhanVien extends JPanel {
         add(pnlDanhSach);
         add(lblTitle);
 
-        // Load dữ liệu ban đầu từ database
-        loadDataToTable();
-
-        // Xử lý sự kiện tìm kiếm động
-        txtTimKiem.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                timKiemNhanVien();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                timKiemNhanVien();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                timKiemNhanVien();
-            }
-        });
-
-        // Xử lý sự kiện nhấp vào bảng để hiển thị thông tin nhân viên
-        tblNhanVien.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                row = tblNhanVien.getSelectedRow();
-                if (row >= 0) {
-                    edit();
-                    updateStatus();
-                }
-            }
-        });
-
-        // Xử lý sự kiện cho các nút điều hướng
+        this.fillTable();
+        this.row=-1;
+        this.updateStatus();
+        btnThem.addActionListener(e -> insert());
+        btnSua.addActionListener(e -> update());
+        btnXoa.addActionListener(e -> delete());
+        btnMoi.addActionListener(e -> clearForm());
         btnFirst.addActionListener(e -> first());
         btnPrev.addActionListener(e -> prev());
         btnNext.addActionListener(e -> next());
         btnLast.addActionListener(e -> last());
+        tblNhanVien.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    row = tblNhanVien.getSelectedRow();
+                    edit();
+                }
+            }
+        });
+        txtTimKiem.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                search();
+            }
 
-        // Cập nhật trạng thái ban đầu
-        updateStatus();
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                search();
+            }
 
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                search();
+            }
+        });
         setVisible(true);
     }
 
-    // Load dữ liệu từ database vào bảng
-    private void loadDataToTable() {
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM NhanVien")) {
-            tableModel.setRowCount(0); // Xóa dữ liệu cũ
-            while (rs.next()) {
-                tableModel.addRow(new Object[]{
-                        rs.getString("manv"),
-                        rs.getString("mk"),
-                        rs.getString("tennv"),
-                        rs.getString("vaitro"),
-                        rs.getString("email")
-                });
+    NhanVienDAO dao = new NhanVienDAO();
+    int row =-1;
+    void insert(){
+        NhanVien nv= getForm();
+        String mk2= new String(txtMatKhau2.getPassword());
+        if(!mk2.equals(nv.getMatKhau())){
+            MsgBox.alert(this,"Xác nhận mật khẩu không đúng");
+        }else{
+            try {
+                dao.insert(nv);this.fillTable();this.clearForm();
+                MsgBox.alert(this, "Thêm mới thành công");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Thêm mới thất bại");
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-    // Tìm kiếm nhân viên từ database
-    private void timKiemNhanVien() {
-        String keyword = txtTimKiem.getText().trim();
-        String query = "SELECT * FROM NhanVien WHERE manv LIKE ? OR tennv LIKE ? OR email LIKE ?";
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            String searchPattern = "%" + keyword + "%";
-            pstmt.setString(1, searchPattern);
-            pstmt.setString(2, searchPattern);
-            pstmt.setString(3, searchPattern);
-            ResultSet rs = pstmt.executeQuery();
-
-            tableModel.setRowCount(0); // Xóa dữ liệu cũ
-            while (rs.next()) {
-                tableModel.addRow(new Object[]{
-                        rs.getString("manv"),
-                        rs.getString("mk"),
-                        rs.getString("tennv"),
-                        rs.getString("vaitro"),
-                        rs.getString("email")
-                });
+    void update(){
+        NhanVien nv= getForm();
+        String mk2= new String(txtMatKhau2.getPassword());
+        if(!mk2.equals(nv.getMatKhau())){
+            MsgBox.alert(this,"Xác nhận mật khẩu không đúng");
+        }else{
+            try {
+                dao.update(nv);this.fillTable();
+                MsgBox.alert(this, "Cập nhật thành công");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Cập nhật thất bại");
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Lỗi khi tìm kiếm: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-    // Hiển thị thông tin nhân viên lên form khi nhấp vào bảng
-    private void edit() {
-        String maNV = (String) tblNhanVien.getValueAt(row, 0);
-        String matKhau = (String) tblNhanVien.getValueAt(row, 1);
-        String hoTen = (String) tblNhanVien.getValueAt(row, 2);
-        String vaiTro = (String) tblNhanVien.getValueAt(row, 3);
-        String email = (String) tblNhanVien.getValueAt(row, 4);
-
-        // Hiển thị thông tin lên các trường nhập liệu
-        txtMaNV.setText(maNV);
-        txtMatKhau.setText(matKhau);
-        txtMatKhau2.setText(matKhau);
-        txtHoTen.setText(hoTen);
-        txtEmail.setText(email);
-
-        // Hiển thị vai trò chính xác trên radio buttons
-        if (vaiTro != null) {
-            if (vaiTro.trim().equalsIgnoreCase("Trưởng phòng")) {
-                rdoTruongPhong.setSelected(true);
-                rdoNhanVien.setSelected(false);
-            } else if (vaiTro.trim().equalsIgnoreCase("Nhân viên")) {
-                rdoNhanVien.setSelected(true);
-                rdoTruongPhong.setSelected(false);
-            } else {
-                // Nếu vai trò không khớp, bỏ chọn cả hai
-                rdoTruongPhong.setSelected(false);
-                rdoNhanVien.setSelected(false);
+    void delete(){
+            String manv=txtMaNV.getText();
+            if(manv.equals(Auth.user.getMaNv())){
+                MsgBox.alert(this, "Bạn không được xoá chính mình");
+            } else if(MsgBox.confirm(this, "Xác nhận xoá?")){
+                try {
+                    dao.delete(manv); fillTable();clearForm();
+                    MsgBox.alert(this, "Xoá thành công!");
+                } catch (Exception e) {
+                    MsgBox.alert(this, "Xoá thất bại!");
+                }
             }
-        } else {
-            // Nếu vai trò là null, bỏ chọn cả hai
-            rdoTruongPhong.setSelected(false);
-            rdoNhanVien.setSelected(false);
+    }
+    void clearForm(){
+        NhanVien nv=new NhanVien();
+        this.setForm(nv);
+        this.row=-1;
+        this.updateStatus();
+    }
+    void edit(){
+        String manv=(String) tblNhanVien.getValueAt(this.row,0);
+        NhanVien nv=dao.selectByID(manv);
+        this.setForm(nv);
+        this.updateStatus();
+    }
+    void first(){
+        this.row=0;
+        this.edit();
+    }
+    void prev(){
+        if(this.row>0){
+            this.row--;
+            this.edit();
         }
     }
-
-    // Điều hướng: Đi đến dòng đầu tiên
-    private void first() {
-        if (tblNhanVien.getRowCount() > 0) {
-            row = 0;
-            tblNhanVien.setRowSelectionInterval(row, row);
-            edit();
-            updateStatus();
+    void next(){
+        if(this.row < tblNhanVien.getRowCount()-1){
+            this.row++;
+            this.edit();
         }
     }
+    void last(){
+        this.row = tblNhanVien.getRowCount()-1;
+        this.edit();
+    }
+    void fillTable(){
+        DefaultTableModel model = (DefaultTableModel) tblNhanVien.getModel();
+        model.setRowCount(0);
+        try {
+            List<NhanVien> list = dao.selectAll();
+            for (NhanVien nv:list){
+                String maskedPassword = "*".repeat(nv.getMatKhau().length());
+                Object[] row =  {nv.getMaNv(),maskedPassword, nv.getHoVaTen(),
+                        nv.isVaiTro()?"Quản lý":"Nhân Viên",nv.getEmail()};
+                model.addRow(row);
+            }
 
-    // Điều hướng: Lùi lại một dòng
-    private void prev() {
-        if (row > 0) {
-            row--;
-            tblNhanVien.setRowSelectionInterval(row, row);
-            edit();
-            updateStatus();
+        }catch (Exception e){
+            MsgBox.alert(this,"Lỗi truy vấn dữ liệu");
         }
     }
-
-    // Điều hướng: Tiến lên một dòng
-    private void next() {
-        if (row < tblNhanVien.getRowCount() - 1) {
-            row++;
-            tblNhanVien.setRowSelectionInterval(row, row);
-            edit();
-            updateStatus();
-        }
+    void setForm(NhanVien nv){
+        txtMaNV.setText(nv.getMaNv());
+        txtHoTen.setText(nv.getHoVaTen());
+        txtMatKhau.setText(nv.getMatKhau());
+        txtMatKhau2.setText(nv.getMatKhau());
+        rdoTruongPhong.setSelected(nv.isVaiTro());
+        rdoNhanVien.setSelected(!nv.isVaiTro());
+        txtEmail.setText(nv.getEmail());
     }
-
-    // Điều hướng: Đi đến dòng cuối cùng
-    private void last() {
-        if (tblNhanVien.getRowCount() > 0) {
-            row = tblNhanVien.getRowCount() - 1;
-            tblNhanVien.setRowSelectionInterval(row, row);
-            edit();
-            updateStatus();
-        }
+    NhanVien getForm(){
+        NhanVien nv= new NhanVien();
+        nv.setMaNv((txtMaNV.getText()));
+        nv.setHoVaTen((txtHoTen.getText()));
+        nv.setMatKhau((txtMatKhau.getText()));
+        nv.setVaiTro(rdoTruongPhong.isSelected());
+        nv.setEmail((txtEmail.getText()));
+        return nv;
     }
-
-    // Cập nhật trạng thái các nút điều hướng
-    private void updateStatus() {
-        boolean edit = (this.row >= 0);
-        boolean first = (this.row == 0);
-        boolean last = (this.row == tblNhanVien.getRowCount() - 1);
-
-        btnFirst.setEnabled(tblNhanVien.getRowCount() > 0 && !first);
-        btnPrev.setEnabled(tblNhanVien.getRowCount() > 0 && !first);
-        btnNext.setEnabled(tblNhanVien.getRowCount() > 0 && !last);
-        btnLast.setEnabled(tblNhanVien.getRowCount() > 0 && !last);
-
-        // Cập nhật trạng thái các nút chức năng (nếu cần)
+    void updateStatus(){
+        boolean edit=(this.row>=0);
+        boolean first=(this.row==0);
+        boolean last=(this.row==tblNhanVien.getRowCount()-1);
+        txtMaNV.setEditable(!edit);
         btnThem.setEnabled(!edit);
         btnSua.setEnabled(edit);
         btnXoa.setEnabled(edit);
-        btnMoi.setEnabled(true);
+        btnFirst.setEnabled(edit && !first);
+        btnPrev.setEnabled(edit && !first);
+        btnNext.setEnabled(edit && !last);
+        btnLast.setEnabled(edit && !last);
     }
+    private void search() {
+        String keyword = txtTimKiem.getText().trim();
+        DefaultTableModel model = (DefaultTableModel) tblNhanVien.getModel();
+        model.setRowCount(0);
+        try {
+            List<NhanVien> list = dao.search(keyword);
+            model.setRowCount(0);
 
+            for (NhanVien nv:list){
+                String maskedPassword = "*".repeat(nv.getMatKhau().length());
+                Object[] row =  {nv.getMaNv(),maskedPassword, nv.getHoVaTen(),
+                        nv.isVaiTro()?"Quản lý":"Nhân Viên",nv.getEmail()};
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            MsgBox.alert(this,"Lỗi tìm kiếm");
+            e.printStackTrace();
+        }
+    }
     // Các phương thức hỗ trợ
     public static void setFontForTextFields(Font font, JComponent... fields) {
         for (JComponent field : fields) {

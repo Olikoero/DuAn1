@@ -66,4 +66,14 @@ public class KhachHangDAO extends DuAnDAO<KhachHang, String>{
         }
         return lishKhachHang;
     }
+    public List<KhachHang> search(String keyword) {
+        String sql = "SELECT * FROM khachhang WHERE "
+                + "makh LIKE ? OR "
+                + "tenkh LIKE ? OR "
+                + "sdt LIKE ? OR "
+                + "email LIKE ? OR "
+                + "diachi LIKE ?";
+        return this.selectBySql(sql, "%" + keyword + "%", "%" + keyword + "%", "%"
+                + keyword + "%", "%" + keyword + "%", "%" + keyword + "%");
+    }
 }

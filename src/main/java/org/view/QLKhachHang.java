@@ -2,12 +2,15 @@ package org.view;
 
 import org.DAO.KhachHangDAO;
 import org.Entity.KhachHang;
+import org.Entity.NhanVien;
 import org.Entity.SanPham;
 import org.util.Auth;
 import org.util.MsgBox;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -19,7 +22,7 @@ import static org.view.QLNhanVien.*;
 
 public class QLKhachHang extends JPanel {
     private JTable tblKhachHang;
-    private JTextField txtMaKH, txtHoTen, txtEmail, txtSDT,txtDiaChi;
+    private JTextField txtMaKH, txtHoTen, txtEmail, txtSDT,txtDiaChi,txtTimKiem;
     private JButton btnFirst, btnPrev,btnNext,btnLast,btnMoi,btnXoa,btnSua,btnThem;
     public QLKhachHang(){
         setSize(986, 713);
@@ -102,7 +105,7 @@ public class QLKhachHang extends JPanel {
         JPanel pnlDanhSach = new JPanel(null);
         JLabel lblTimKiem= new JLabel("Tìm kiếm:");
         lblTimKiem.setBounds(10,10,100,30);
-        JTextField txtTimKiem= new JTextField();
+        txtTimKiem= new JTextField();
         txtTimKiem.setBounds(140,10,406,30);
 
         pnlDanhSach.setBounds(410,100,556,583);
@@ -148,6 +151,22 @@ public class QLKhachHang extends JPanel {
                     row = tblKhachHang.getSelectedRow();
                     edit();
                 }
+            }
+        });
+        txtTimKiem.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                search();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                search();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                search();
             }
         });
     }
@@ -263,6 +282,25 @@ public class QLKhachHang extends JPanel {
         btnNext.setEnabled(edit && !last);
         btnLast.setEnabled(edit && !last);
     }
+    private void search() {
+        String keyword = txtTimKiem.getText().trim();
+        DefaultTableModel model = (DefaultTableModel) tblKhachHang.getModel();
+        model.setRowCount(0);
+        try {
+            List<KhachHang> list = dao.search(keyword);
+            model.setRowCount(0);
+
+            for (KhachHang kh:list){
+                Object[] row =  {kh.getMaKH(),kh.getTenKH(), kh.getSdt(),
+                        kh.getEmail(),kh.getDiaChi()};
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            MsgBox.alert(this,"Lỗi tìm kiếm");
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Forgot Password");
@@ -278,4 +316,5 @@ public class QLKhachHang extends JPanel {
             frame.setVisible(true);
         });
     }
+
 }
