@@ -2,11 +2,14 @@ package org.view;
 
 import org.DAO.ChiTietHoaDonDAO;
 import org.DAO.HoaDonDAO;
+import org.DAO.SanPhamDAO;
 import org.Entity.CTHD;
 import org.Entity.HoaDon;
 import org.Entity.KhachHang;
+import org.Entity.SanPham;
 import org.util.Auth;
 import org.util.MsgBox;
+import org.util.SanPhamThemListener;
 import org.util.XDate;
 
 import javax.swing.*;
@@ -26,7 +29,7 @@ import static org.view.QLNhanVien.setBooleanProperty;
 public class QLHoaDon extends JPanel {
     private JTable tableHoaDon, tableChiTiet;
     private JTextField txtMaHD, txtMaKH, txtNgayLap, txtTongTien;
-    private JButton btnThem,btnMoi, btnPrint, btnPrev, btnNext, btnLast, btnFirst, btnThemSP, btnLuuHoaDon;
+    private JButton btnThem,btnMoi, btnPrint, btnPrev, btnNext, btnLast, btnFirst, btnThemSP, btnXoaChiTiet;
 
     public QLHoaDon() {
         setLayout(null);
@@ -102,11 +105,9 @@ public class QLHoaDon extends JPanel {
         txtTimKiem.setBounds(100,10,455,30);
 
         tableHoaDon = new JTable(new DefaultTableModel( new Object[][]{},
-                new String[]{"Mã HD", "Mã KH", "Mã NV", "Ngày lập", "Tổng tiền"}
-        ){
+                new String[]{"Mã HD", "Mã KH", "Mã NV", "Ngày lập", "Tổng tiền"}) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // Không cho phép chỉnh sửa bất kỳ ô nào
                 return false;
             }
         });
@@ -114,12 +115,10 @@ public class QLHoaDon extends JPanel {
         scrollHoaDon.setBorder(BorderFactory.createTitledBorder("Danh sách hóa đơn"));
         scrollHoaDon.setBounds(10, 40, 555, 353);
 
-        tableChiTiet = new JTable(new DefaultTableModel( new Object[][]{},
-                new String[]{"Tên SP", "Số lượng","Đơn giá", "Thành tiền"}
-        ){
+        tableChiTiet = new JTable(new DefaultTableModel(new Object[][]{},
+                new String[]{"Tên SP", "Số lượng", "Đơn giá", "Thành tiền"}) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // Không cho phép chỉnh sửa bất kỳ ô nào
                 return false;
             }
         });
@@ -134,14 +133,13 @@ public class QLHoaDon extends JPanel {
 
         btnThemSP=new JButton("Thêm sản phẩm");
         btnThemSP.setBounds(590,363,150,30);
-        btnThemSP.addActionListener(e -> new ChiTietHoaDon());
 
-        btnLuuHoaDon= new JButton("Lưu thay đổi");
-        btnLuuHoaDon.setBounds(760,363,150,30);
+        btnXoaChiTiet= new JButton("Xóa sản phẩm");
+        btnXoaChiTiet.setBounds(760,363,150,30);
         pnlTable.add(btnThemSP);
-        pnlTable.add(btnLuuHoaDon);
+        pnlTable.add(btnXoaChiTiet);
         setFontForTextFields(font,lblMaHD,lblMaKH,lblNgayLap,lblTongTien,lblTimKiem);
-        AbstractButton[] btn={btnPrev,btnThemSP,btnLast,btnNext,btnLuuHoaDon,btnFirst,btnPrint,btnThem,btnMoi};
+        AbstractButton[] btn={btnPrev,btnThemSP,btnLast,btnNext,btnXoaChiTiet,btnFirst,btnPrint,btnThem,btnMoi};
         Color defaultBorderColor = Color.LIGHT_GRAY;
         setComponentProperty(btn, c -> c.setBackground(defaultBorderColor) );
         setBooleanProperty(btn, AbstractButton::setFocusPainted, false);
@@ -168,11 +166,30 @@ public class QLHoaDon extends JPanel {
                 }
             }
         });
+        btnThemSP.addActionListener(e -> {
+            if (row >= 0) {
+                String maHD = (String) tableHoaDon.getValueAt(row, 0);
 
+                SanPhamThemListener listener = new SanPhamThemListener() {
+                    @Override
+                    public void onSanPhamAdded(String maHD) {
+                        edit(); // Cập nhật bảng chi tiết
+                           // Cập nhật tổng tiền
+                        fillTable();            // Cập nhật bảng hóa đơn
+                    }
+                };
+
+                ChiTietHoaDon chiTietForm = new ChiTietHoaDon(maHD, listener); // Truyền maHD và listener
+            } else {
+                MsgBox.alert(this, "Vui lòng chọn một hóa đơn trước khi thêm sản phẩm!");
+            }
+        });
+        btnXoaChiTiet.addActionListener(e -> delete());
     }
     int row=-1;
     HoaDonDAO hdDAO= new HoaDonDAO();
     ChiTietHoaDonDAO ctDAO= new ChiTietHoaDonDAO();
+    SanPhamDAO spDAO= new SanPhamDAO();
 
     void insert(){
         HoaDon hd= getForm();
@@ -234,6 +251,7 @@ public class QLHoaDon extends JPanel {
         }catch (Exception e){
             MsgBox.alert(this,"Lỗi truy vấn dữ liệu");
         }
+        fillTableChiTiet();
     }
     void fillTableChiTiet(){
         DefaultTableModel model = (DefaultTableModel) tableChiTiet.getModel();
@@ -270,6 +288,34 @@ public class QLHoaDon extends JPanel {
         hd.setTongTien(Double.parseDouble(txtTongTien.getText()));
         return hd;
     }
+    void delete() {
+        int row1 = tableChiTiet.getSelectedRow();
+        if (row1 == -1) {
+            MsgBox.alert(this, "Vui lòng chọn sản phẩm cần xoá!");
+            return;
+        }
+
+        String mahd = txtMaHD.getText();
+        String tenSP = (String) tableChiTiet.getValueAt(row1, 0);
+        SanPham sp = spDAO.selectByTenSP(tenSP);
+
+        if (sp == null) {
+            MsgBox.alert(this, "Không tìm thấy mã sản phẩm!");
+            return;
+        }
+
+        if (MsgBox.confirm(this, "Xác nhận xoá?")) {
+            try {
+                ctDAO.delete(mahd, sp.getMaSP());
+                fillTable();
+                edit();
+                MsgBox.alert(this, "Xoá thành công!");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Xoá thất bại!");
+            }
+        }
+    }
+
     void updateStatus(){
         boolean edit=(this.row>=0);
         boolean first=(this.row==0);
