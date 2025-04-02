@@ -1,9 +1,19 @@
 package org.view;
 
+import org.DAO.KhachHangDAO;
+import org.Entity.KhachHang;
+import org.Entity.SanPham;
+import org.util.Auth;
+import org.util.MsgBox;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import static org.view.QLNhanVien.*;
 
@@ -99,7 +109,7 @@ public class QLKhachHang extends JPanel {
         pnlDanhSach.setBorder(new LineBorder(Color.BLUE,1));
         tblKhachHang = new JTable(new DefaultTableModel(
                 new Object[][]{},
-                new String[]{"MÃ KHÁCH HÀNG", "HỌ VÀ TÊN", "EMAIL", "SỐ ĐIỆN THOẠI"}
+                new String[]{"MÃ KHÁCH HÀNG", "HỌ VÀ TÊN", "EMAIL", "SỐ ĐIỆN THOẠI","ĐỊA CHỈ"}
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -120,6 +130,138 @@ public class QLKhachHang extends JPanel {
         add(pnlDanhSach);
         add(lblTitle);
         setVisible(true);
+        this.fillTable();
+        this.row=-1;
+        this.updateStatus();
+        btnThem.addActionListener(e -> insert());
+        btnSua.addActionListener(e -> update());
+        btnXoa.addActionListener(e -> delete());
+        btnMoi.addActionListener(e -> clearForm());
+        btnFirst.addActionListener(e -> first());
+        btnPrev.addActionListener(e -> prev());
+        btnNext.addActionListener(e -> next());
+        btnLast.addActionListener(e -> last());
+        tblKhachHang.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    row = tblKhachHang.getSelectedRow();
+                    edit();
+                }
+            }
+        });
+    }
+    KhachHangDAO dao = new KhachHangDAO();
+    int row=-1;
+
+    void insert(){
+        KhachHang kh= getForm();
+
+            try {
+                dao.insert(kh);this.fillTable();this.clearForm();
+                MsgBox.alert(this, "Thêm mới thành công");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Thêm mới thất bại");
+            }
+    }
+    void update(){
+        KhachHang kh= getForm();
+            try {
+                dao.update(kh);this.fillTable();
+                MsgBox.alert(this, "Cập nhật thành công");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Cập nhật thất bại");
+            }
+    }
+    void delete(){
+
+            String makh=txtMaKH.getText();
+            if(makh.equals(Auth.user.getMaNv())){
+                MsgBox.alert(this, "Bạn không được xoá chính mình");
+            } else if(MsgBox.confirm(this, "Xác nhận xoá?")){
+                try {
+                    dao.delete(makh); fillTable();clearForm();
+                    MsgBox.alert(this, "Xoá thành công!");
+                } catch (Exception e) {
+                    MsgBox.alert(this, "Xoá thất bại!");
+                }
+            }
+        }
+    void clearForm(){
+        KhachHang kh=new KhachHang();
+        this.setForm(kh);
+        this.row=-1;
+        this.updateStatus();
+    }
+    void edit(){
+        String makh=(String) tblKhachHang.getValueAt(this.row,0);
+        KhachHang kh=dao.selectByID(makh);
+        this.setForm(kh);
+        this.updateStatus();
+    }
+    void first(){
+        this.row=0;
+        this.edit();
+    }
+    void prev(){
+        if(this.row>0){
+            this.row--;
+            this.edit();
+        }
+    }
+    void next(){
+        if(this.row < tblKhachHang.getRowCount()-1){
+            this.row++;
+            this.edit();
+        }
+    }
+    void last(){
+        this.row = tblKhachHang.getRowCount()-1;
+        this.edit();
+    }
+    void fillTable(){
+        DefaultTableModel model = (DefaultTableModel) tblKhachHang.getModel();
+        model.setRowCount(0);
+        try {
+            List<KhachHang> list = dao.selectAll();
+            for (KhachHang kh:list){
+                Object[] row =  {kh.getMaKH(),kh.getTenKH(), kh.getSdt(),
+                        kh.getEmail(),kh.getDiaChi()};
+                model.addRow(row);
+            }
+
+        }catch (Exception e){
+            MsgBox.alert(this,"Lỗi truy vấn dữ liệu");
+        }
+    }
+    void setForm(KhachHang kh){
+        txtMaKH.setText(kh.getMaKH());
+        txtHoTen.setText(kh.getTenKH());
+        txtSDT.setText(kh.getSdt());
+        txtEmail.setText(kh.getEmail());
+        txtDiaChi.setText(kh.getDiaChi());
+    }
+    KhachHang getForm(){
+        KhachHang kh= new KhachHang();
+        kh.setMaKH((txtMaKH.getText()));
+        kh.setTenKH((txtHoTen.getText()));
+        kh.setSdt((txtSDT.getText()));
+        kh.setEmail(txtEmail.getText());
+        kh.setDiaChi(txtDiaChi.getText());
+        return kh;
+    }
+    void updateStatus(){
+        boolean edit=(this.row>=0);
+        boolean first=(this.row==0);
+        boolean last=(this.row==tblKhachHang.getRowCount()-1);
+        txtMaKH.setEditable(!edit);
+        btnThem.setEnabled(!edit);
+        btnSua.setEnabled(edit);
+        btnXoa.setEnabled(edit);
+        btnFirst.setEnabled(edit && !first);
+        btnPrev.setEnabled(edit && !first);
+        btnNext.setEnabled(edit && !last);
+        btnLast.setEnabled(edit && !last);
     }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
