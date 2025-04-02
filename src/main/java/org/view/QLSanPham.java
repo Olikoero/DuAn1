@@ -353,9 +353,9 @@ public class QLSanPham extends JPanel {
             sp.setMaSP((Integer) tblSanPham.getValueAt(selectedRow, 0));
             dao.update(sp);
             fillTable();
-            JOptionPane.showMessageDialog(this, "Cập nhật sản phẩm thành công!");
+            MsgBox.alert(this, "Cập nhật sản phẩm thành công!");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Lỗi cập nhật sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            MsgBox.alert(this, "Lỗi cập nhật sản phẩm!");
             e.printStackTrace();
         }
     }
@@ -375,14 +375,33 @@ public class QLSanPham extends JPanel {
     }
 
     private void chonAnh() {
-        JFileChooser fileChooser = new JFileChooser();
+        fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         int returnValue = fileChooser.showOpenDialog(this);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
-            ImageIcon icon = new ImageIcon(new ImageIcon(selectedFile.getAbsolutePath()).getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH));
-            lblAnh.setIcon(icon);
-            lblAnh.setToolTipText(selectedFile.getName()); // Lưu tên file
+            try {
+                // Lấy kích thước của lblAnh
+                int width = lblAnh.getWidth();
+                int height = lblAnh.getHeight();
+
+                // Nếu kích thước chưa có (chưa vẽ giao diện), dùng giá trị mặc định
+                if (width == 0 || height == 0) {
+                    width = 210;  // Rộng mặc định từ setBounds
+                    height = 260; // Cao mặc định từ setBounds
+                }
+
+                // Tải và điều chỉnh kích thước ảnh
+                ImageIcon originalIcon = new ImageIcon(selectedFile.getAbsolutePath());
+                Image scaledImage = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon = new ImageIcon(scaledImage);
+
+                // Đặt ảnh vào lblAnh
+                lblAnh.setIcon(scaledIcon);
+                lblAnh.setToolTipText(selectedFile.getName()); // Lưu tên file
+            } catch (Exception e) {
+                MsgBox.alert(this, "Lỗi khi tải ảnh: " + e.getMessage());
+            }
         }
     }
 
@@ -392,9 +411,6 @@ public class QLSanPham extends JPanel {
             List<SanPham> list = dao.search(keyword);
             model.setRowCount(0);
 
-            if (list.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Không có sản phẩm nào phù hợp!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-            } else {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                 for (SanPham sp : list) {
                     Object[] row = {
@@ -408,9 +424,8 @@ public class QLSanPham extends JPanel {
                     };
                     model.addRow(row);
                 }
-            }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Lỗi tìm kiếm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            MsgBox.alert(this,"Lỗi tìm kiếm");
             e.printStackTrace();
         }
     }
@@ -424,28 +439,26 @@ public class QLSanPham extends JPanel {
         txtGiaNhap.setText(String.valueOf(sp.getGiaNhap()));
         txtGiaBan.setText(String.valueOf(sp.getGiaBan()));
         txtGhiChu.setText(sp.getGhiChu());
+        int width = lblAnh.getWidth();
+        int height = lblAnh.getHeight();
+        if (width == 0 || height == 0) {
+            width = 210;  // Kích thước mặc định từ setBounds
+            height = 260;
+        }
+
         if (sp.getAnh() != null) {
             lblAnh.setToolTipText(sp.getAnh());
-            lblAnh.setIcon(XImage.read(sp.getAnh()));
+            ImageIcon icon = XImage.read(sp.getAnh());
+            if (icon != null) {
+                Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                lblAnh.setIcon(new ImageIcon(scaledImage));
+            } else {
+                lblAnh.setIcon(null);
+            }
         } else {
             lblAnh.setIcon(null);
             lblAnh.setToolTipText(null);
         }
-    }
-
-    private void clearForm() {
-        txtMaSP.setText("");
-        txtTenSP.setText("");
-        txtSL.setText("");
-        txtGiaNhap.setText("");
-        txtGiaBan.setText("");
-        txtNgayNhap.setText("");
-        txtGhiChu.setText("");
-        lblAnh.setIcon(null);
-        lblAnh.setToolTipText("");
-
-        this.row = -1;
-        this.updateStatus();
     }
 
     void edit() {
