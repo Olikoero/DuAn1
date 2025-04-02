@@ -329,7 +329,7 @@ public class QLNhanVien extends JPanel {
         btnNext.setEnabled(tblNhanVien.getRowCount() > 0 && !last);
         btnLast.setEnabled(tblNhanVien.getRowCount() > 0 && !last);
 
-        // Cập nhật trạng thái các nút chức năng (nếu cần)
+        // Cập nhật trạng thái các nút chức năng
         btnThem.setEnabled(!edit);
         btnSua.setEnabled(edit);
         btnXoa.setEnabled(edit);
@@ -377,3 +377,4 @@ public class QLNhanVien extends JPanel {
         });
     }
 }
+//Test
