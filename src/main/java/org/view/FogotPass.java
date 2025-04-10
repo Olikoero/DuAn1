@@ -103,7 +103,7 @@ public class FogotPass extends JPanel {
                 return;
             }
 
-            // Tạo mật khẩu mới
+            // Tạo mật khẩu mới 1
             String newPassword = generateRandomPassword(6);
 
             // Cập nhật mật khẩu mới vào database

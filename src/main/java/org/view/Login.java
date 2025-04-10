@@ -106,7 +106,7 @@ public class Login extends JPanel {
         String manv = txtUser.getText();
         String matKhau = new String(txtPass.getPassword());
         NhanVien nv = nvDAO.selectByID(manv);
-//9Ox3GsSd
+//9Ox3GsSd 1
         if (nv == null || manv == null || manv.trim().isEmpty()) {
             MsgBox.alert(this, "Vui lòng nhập đúng đăng nhập!");
         } else if (manv.endsWith(" ")) {
