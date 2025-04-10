@@ -104,7 +104,7 @@ public class FogotPass extends JPanel {
             }
 
             // Tạo mật khẩu mới
-            String newPassword = generateRandomPassword(8);
+            String newPassword = generateRandomPassword(6);
 
             // Cập nhật mật khẩu mới vào database
             updatePasswordInDatabase(email, newPassword);
@@ -122,10 +122,10 @@ public class FogotPass extends JPanel {
             ex.printStackTrace();
         }
     }
-
+//    ABCDEFGHIJKLMNOPQRSTUVWXYZ
     // Hàm tạo mật khẩu ngẫu nhiên
     private String generateRandomPassword(int length) {
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         Random random = new Random();
         StringBuilder password = new StringBuilder();
         for (int i = 0; i < length; i++) {

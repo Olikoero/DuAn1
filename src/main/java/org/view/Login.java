@@ -106,22 +106,27 @@ public class Login extends JPanel {
         String manv = txtUser.getText();
         String matKhau = new String(txtPass.getPassword());
         NhanVien nv = nvDAO.selectByID(manv);
-
-        if (nv == null) {
-            MsgBox.alert(this, "Sai tên đăng nhập!");
-        } else if (!matKhau.equals(nv.getMatKhau())) {
+//9Ox3GsSd
+        if (nv == null || manv == null || manv.trim().isEmpty()) {
+            MsgBox.alert(this, "Vui lòng nhập đúng đăng nhập!");
+        } else if (manv.endsWith(" ")) {
+            MsgBox.alert(this, "Chuỗi có khoảng trắng ở cuối!");
+        } else if (!manv.equals(nv.getMaNv())) {
+            MsgBox.alert(this, "Vui lòng nhập đúng đăng nhập!");
+        } else if (matKhau == null || matKhau.trim().isEmpty()) {
+            MsgBox.alert(this, "Vui lòng nhập mật khẩu!");
+        } else if (nv.getMatKhau() == null || !matKhau.equals(nv.getMatKhau())) {
             MsgBox.alert(this, "Sai mật khẩu!");
-        } else if (chkremember.isSelected()) {
-            prefs.put("username", manv);
-            prefs.put("password", matKhau);
-            prefs.putBoolean("remember", true);
-//            MsgBox.alert(this, "Đăng Nhập Thành Công!");
-            Auth.user = nv;
-            new MainScreen();
-        } else {
+        } else if (!chkremember.isSelected()) {
             prefs.remove("username");
             prefs.remove("password");
             prefs.remove("remember");
+            Auth.user = nv;
+            new MainScreen();
+        } else {
+            prefs.put("username", manv);
+            prefs.put("password", matKhau);
+            prefs.putBoolean("remember", true);
             Auth.user = nv;
             new MainScreen();
         }
