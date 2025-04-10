@@ -6,6 +6,7 @@ package org.DAO;/*
 
 import org.DAO.DuAnDAO;
 import org.Entity.NhanVien;
+import org.Entity.SanPham;
 import org.util.JDBCHelper;
 
 import java.sql.Connection;
@@ -25,22 +26,22 @@ import javax.mail.internet.MimeMessage;
  * @author huanl
  */
 public class NhanVienDAO extends DuAnDAO<NhanVien, String> {
-    final String INSERT_SQL = "INSERT INTO Nhanvien(MaNV,MatKhau,HoTen,VaiTro,GioiTinh) Values(?,?,?,?,?)";
-    final String UPDATE_SQL = "UPDATE Nhanvien set MatKhau = ?, Hoten =?, VaiTro=?, GioiTinh=? WHERE MaNV=?";
-    final String DELETE_SQL = "DELETE FROM NhanVien WHERE MaNV=?";
-    final String SELECT_ALL_SQL = "SELECT * FROM NhanVien";
-    final String SELECT_BY_ID = "SELECT * FROM NhanVien WHERE MaNV=?";
+    final String INSERT_SQL = "INSERT INTO nhanvien(manv,mk,tennv,vaitro,email) Values(?,?,?,?,?)";
+    final String UPDATE_SQL = "UPDATE nhanvien set mk = ?, tennv =?, vaitro=?, email=? WHERE manv=?";
+    final String DELETE_SQL = "DELETE FROM nhanvien WHERE manv=?";
+    final String SELECT_ALL_SQL = "SELECT * FROM nhanvien";
+    final String SELECT_BY_ID = "SELECT * FROM nhanvien WHERE manv=?";
 
     @Override
     public void insert(NhanVien entity) throws SQLException {
-        JDBCHelper.update(INSERT_SQL, entity.getMaNv(), entity.getMatKhau(), entity.getHoVaTen(),entity.isVaiTro(),entity.getGioitinh());
+        JDBCHelper.update(INSERT_SQL, entity.getMaNv(), entity.getMatKhau(), entity.getHoVaTen(),entity.isVaiTro(),entity.getEmail());
     }
 
 
     @Override
     public void update(NhanVien entity) throws SQLException {
 
-        JDBCHelper.update(UPDATE_SQL,entity.getMatKhau(), entity.getHoVaTen(), entity.isVaiTro(), entity.getGioitinh(), entity.getMaNv());
+        JDBCHelper.update(UPDATE_SQL,entity.getMatKhau(), entity.getHoVaTen(), entity.isVaiTro(), entity.getEmail(), entity.getMaNv());
     }
 
 
@@ -65,7 +66,7 @@ public class NhanVienDAO extends DuAnDAO<NhanVien, String> {
         return listNhanVien.get(0);
     }
     public boolean checkEmailExists(String email) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM NhanVien WHERE Email = ?";
+        String sql = "SELECT COUNT(*) FROM nhanvien WHERE emaol = ?";
         try (Connection conn = JDBCHelper.getConnection(); // Sử dụng getConnection()
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
@@ -87,17 +88,24 @@ public class NhanVienDAO extends DuAnDAO<NhanVien, String> {
             ResultSet rs = JDBCHelper.query(sql, args);
             while (rs.next()) {
                 NhanVien entity = new NhanVien();
-                entity.setMaNv(rs.getString("MaNV"));
-                entity.setHoVaTen(rs.getString("HoTen"));
-                entity.setMatKhau(rs.getString("MatKhau"));
-                entity.setVaiTro(rs.getBoolean("Vaitro"));
-                entity.setGioitinh(rs.getInt("GioiTinh"));
-                entity.setEmail(rs.getString("Email"));
+                entity.setMaNv(rs.getString("manv"));
+                entity.setHoVaTen(rs.getString("tennv"));
+                entity.setMatKhau(rs.getString("mk"));
+                entity.setVaiTro(rs.getBoolean("vaitro"));
+                entity.setEmail(rs.getString("email"));
                 listNhanVien.add(entity);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return listNhanVien;
+    }
+    public List<NhanVien> search(String keyword) {
+        String sql = "SELECT * FROM nhanvien WHERE "
+                + "manv LIKE ? OR "
+                + "tennv LIKE ? OR "
+                + "email LIKE ?";
+        return this.selectBySql(sql, "%" + keyword + "%", "%" + keyword + "%", "%"
+                + keyword + "%");
     }
 }

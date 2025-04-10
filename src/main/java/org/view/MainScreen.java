@@ -12,6 +12,8 @@ import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static org.view.QLNhanVien.*;
+
 public class MainScreen extends JFrame {
     private JPanel pnlMain;
     private JTextField txtUser;
@@ -27,6 +29,8 @@ public class MainScreen extends JFrame {
         setResizable(false);
         setIconImage(XImage.getAppIcon("/img/basket.png"));
         setLocationRelativeTo(null);
+
+
         //Panel Menu
         JPanel pnlMenu = new JPanel();
         pnlMenu.setLayout(null);
@@ -49,95 +53,57 @@ public class MainScreen extends JFrame {
         JPanel pnlUser = new JPanel(null);
         pnlUser.setBounds(0, 200, 200, 230);
         lblUser = new JLabel();
-        lblUser.setFont(font);
         lblUser.setBounds(10, 10, 40, 40);
         lblUser.setIcon(new ImageIcon("img/onl.png"));
         txtUser = new JTextField("ALABABA");
-        txtUser.setFont(font);
         txtUser.setBounds(45, 10, 150, 40);
         txtUser.setBackground(defaultBorderColor);
         txtUser.setBorder(BorderFactory.createEmptyBorder(0,15,0,15));
         txtUser.setEditable(false);
         btnMnuTroGiup = new JButton("Hướng dẫn");
-        btnMnuTroGiup.setFont(menuFont);
         btnMnuTroGiup.setBounds(5, 60, 190, 40);
         btnLogin = new JButton();
-        btnLogin.setFont(font);
         btnLogin.setBounds(5, 110, 90, 50);
         btnLogin.setIcon(XImage.loadImage("img/login.png",btnLogin));
         btnLogout = new JButton();
-        btnLogout.setFont(font);
         btnLogout.setBounds(105, 110, 90, 50);
         btnLogout.setIcon(XImage.loadImage("img/logout.png",btnLogout));
         btnChangePass = new JButton("Đổi mật khẩu");
         btnChangePass.setFont(font);
         btnChangePass.setBounds(5, 170, 190, 50);
         btnChangePass.setIcon(new ImageIcon("img/change.png"));
-        pnlUser.add(lblUser);
-        pnlUser.add(txtUser);
-        pnlUser.add(btnMnuTroGiup);
-        pnlUser.add(btnLogin);
-        pnlUser.add(btnLogout);
-        pnlUser.add(btnChangePass);
-        btnLogin.setFocusPainted(false);
-        btnLogout.setFocusPainted(false);
-        btnChangePass.setFocusPainted(false);
-        btnLogin.setBackground(defaultBorderColor);
-        btnLogout.setBackground(defaultBorderColor);
-        btnChangePass.setBackground(defaultBorderColor);
-
+        addCompoment(pnlUser,lblUser,txtUser,btnMnuTroGiup,btnChangePass,btnLogin,btnLogout);
+        setFontForTextFields(font,lblUser,txtUser,btnChangePass);
 
         //menubar
         JPanel toolbar = new JPanel();
         toolbar.setLayout(new GridLayout(5, 1, 2, 2));
         toolbar.setBounds(0, 430, 200, 284);
         btnMnuSanPham = new JButton("Sản phẩm");
-        btnMnuSanPham.setFont(menuFont);
         btnMnuSanPham.setIcon(new ImageIcon("img/product.png"));
         btnMnuHoaDon = new JButton("Hoá đơn");
-        btnMnuHoaDon.setFont(menuFont);
         btnMnuHoaDon.setIcon(new ImageIcon("img/invoice.png"));
         btnMnuNhanSu = new JButton("Nhân sự");
-        btnMnuNhanSu.setFont(menuFont);
         btnMnuNhanSu.setIcon(new ImageIcon("img/employ.png"));
         btnMnuKhachHang = new JButton("Khách hàng");
-        btnMnuKhachHang.setFont(menuFont);
         btnMnuKhachHang.setIcon(new ImageIcon("img/custom.png"));
         btnMnuThongKe = new JButton("Thống kê");
-        btnMnuThongKe.setFont(menuFont);
         btnMnuThongKe.setIcon(new ImageIcon("img/statis.png"));
+        setFontForTextFields(menuFont,btnMnuTroGiup,btnMnuSanPham,btnMnuHoaDon,btnMnuNhanSu,
+                btnMnuKhachHang,btnMnuThongKe);
 
-        toolbar.add(btnMnuSanPham);
-        toolbar.add(btnMnuHoaDon);
-        toolbar.add(btnMnuNhanSu);
-        toolbar.add(btnMnuKhachHang);
-        toolbar.add(btnMnuThongKe);
-
-        btnMnuSanPham.setFocusPainted(false);
-        btnMnuHoaDon.setFocusPainted(false);
-        btnMnuNhanSu.setFocusPainted(false);
-        btnMnuKhachHang.setFocusPainted(false);
-        btnMnuThongKe.setFocusPainted(false);
-        btnMnuTroGiup.setFocusPainted(false);
-
-        btnMnuSanPham.setBorderPainted(false);
-        btnMnuHoaDon.setBorderPainted(false);
-        btnMnuNhanSu.setBorderPainted(false);
-        btnMnuKhachHang.setBorderPainted(false);
-        btnMnuThongKe.setBorderPainted(false);
-        btnMnuTroGiup.setBorderPainted(false);
-
+        addCompoment(toolbar,btnMnuSanPham,btnMnuHoaDon,btnMnuKhachHang,btnMnuNhanSu,btnMnuThongKe);
 
         Color selectedBorderColor = Color.CYAN;
         Color hoverBorderColor = Color.GRAY;
         JButton[] selectedButton = {null};
 
-        btnMnuSanPham.setBackground(defaultBorderColor);
-        btnMnuHoaDon.setBackground(defaultBorderColor);
-        btnMnuNhanSu.setBackground(defaultBorderColor);
-        btnMnuKhachHang.setBackground(defaultBorderColor);
-        btnMnuThongKe.setBackground(defaultBorderColor);
-        btnMnuTroGiup.setBackground(defaultBorderColor);
+        AbstractButton[] btn= {btnMnuSanPham,btnMnuHoaDon,btnMnuNhanSu,btnMnuKhachHang,
+                btnMnuThongKe,btnMnuTroGiup,btnLogin,btnLogout,btnChangePass};
+
+        setComponentProperty(btn, c -> c.setBackground(defaultBorderColor) );
+        setBooleanProperty(btn, AbstractButton::setFocusPainted, false);
+        setBooleanProperty(btn, AbstractButton::setBorderPainted, false);
 
         MouseAdapter hoverEffect = new MouseAdapter() {
             @Override
@@ -179,26 +145,16 @@ public class MainScreen extends JFrame {
                 showPanel(new LogoMain());
             }
         };
-        btnMnuSanPham.addMouseListener(hoverEffect);
-        btnMnuHoaDon.addMouseListener(hoverEffect);
-        btnMnuNhanSu.addMouseListener(hoverEffect);
-        btnMnuKhachHang.addMouseListener(hoverEffect);
-        btnMnuThongKe.addMouseListener(hoverEffect);
-        btnMnuTroGiup.addMouseListener(hoverEffect);
 
-        btnMnuSanPham.addActionListener(clickEffect);
-        btnMnuHoaDon.addActionListener(clickEffect);
-        btnMnuNhanSu.addActionListener(clickEffect);
-        btnMnuKhachHang.addActionListener(clickEffect);
-        btnMnuThongKe.addActionListener(clickEffect);
-        btnMnuTroGiup.addActionListener(clickEffect);
+        addEffects(hoverEffect,clickEffect,btnMnuSanPham,btnMnuHoaDon,btnMnuNhanSu,btnMnuKhachHang,
+                btnMnuThongKe,btnMnuTroGiup,btnChangePass);
+
         pnlMenu.add(lblLogo);
         pnlMenu.add(toolbar);
         pnlMenu.add(pnlUser);
 
         //Panel nội dung
         pnlMain = new LogoMain();
-//        pnlMain.setLayout(new BorderLayout());
         pnlMain.setBounds(200, 0, 986, 713);
 
         //Time
@@ -221,19 +177,57 @@ public class MainScreen extends JFrame {
         pnlTrangThai.add(lblTrangThai, BorderLayout.WEST);
         pnlTrangThai.add(lblDongHo, BorderLayout.EAST);
         btnChangePass.addActionListener(e -> showPanel(new ChangePass()));
-        //a
+        btnLogin.addActionListener(e -> DangNhap());
+        btnLogout.addActionListener(e -> DangXuat());
 
         add(pnlMenu);
         add(pnlMain);
         add(pnlTrangThai);
         setVisible(true);
+        status();
+        Employees();
     }
-
+    public static void addEffects(MouseAdapter hoverEffect, ActionListener clickEffect, JButton... buttons) {
+        for (JButton button : buttons) {
+            button.addMouseListener(hoverEffect);
+            button.addActionListener(clickEffect);
+        }
+    }
     private void showPanel(JPanel panel) {
+        if(Auth.isLogin()) {
             pnlMain.removeAll(); // Xóa nội dung cũ
             pnlMain.add(panel, BorderLayout.CENTER); // Thêm panel mới
             pnlMain.revalidate(); // Cập nhật giao diện
             pnlMain.repaint();
+        }else {
+            MsgBox.alert(this, "Chua dang nhap");
+        }
+    }
+    void DangNhap(){
+        new LoginScreen().setVisible(true);
+    }
+    void DangXuat(){
+        Auth.clear();
+        new LoginScreen().setVisible(true);
+        this.dispose();
+    }
+    public void status() {
+        if (Auth.isLogin()) {
+            txtUser.setText(Auth.user.getHoVaTen());
+            lblUser.setIcon(new ImageIcon("img/onl.png"));
+        } else {
+            txtUser.setText("Guest");
+            lblUser.setIcon(new ImageIcon("img/off.png"));
+        }
+    }
+    public void Employees() {
+        if (Auth.isManager()) {
+            btnMnuNhanSu.setVisible(true);
+            btnMnuThongKe.setVisible(true);
+        } else {
+            btnMnuNhanSu.setVisible(false);
+            btnMnuThongKe.setVisible(false);
+        }
     }
 
 

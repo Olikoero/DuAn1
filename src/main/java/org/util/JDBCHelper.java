@@ -1,12 +1,13 @@
 package org.util;
 
 import java.sql.*;
+import java.util.List;
 
 public class JDBCHelper {
     static String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    static String dburl = "jdbc:sqlserver://localhost:1433;DatabaseName=EduSys;encrypt=true;trustServerCertificate=true;";
+    static String dburl = "jdbc:sqlserver://localhost:1433;DatabaseName=ThunderStore;encrypt=true;trustServerCertificate=true;";
     static String user = "sa";
-    static String pass = "songlong";
+    static String pass = "123";
 
     static {
         try {
@@ -44,6 +45,12 @@ public class JDBCHelper {
         PreparedStatement stmt = getStmt(sql, args);
         return stmt.executeQuery();
     }
+    public static Object[] query1(String sql, Object... args) throws SQLException {
+    Connection conn = getConnection();
+    PreparedStatement stmt = getStmt(sql, args);
+    ResultSet rs = stmt.executeQuery();
+    return new Object[]{conn, stmt, rs}; // Trả về cả 3 đối tượng để không bị đóng sớm
+}
 
     public static Object value(String sql, Object... args) {
         try (ResultSet rs = query(sql, args);
