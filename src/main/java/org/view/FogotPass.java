@@ -136,7 +136,7 @@ public class FogotPass extends JPanel {
 
     // Hàm cập nhật mật khẩu vào database
     private void updatePasswordInDatabase(String email, String newPassword) throws SQLException {
-        String sql = "UPDATE NhanVien SET MatKhau = ? WHERE Email = ?";
+        String sql = "UPDATE NhanVien SET mk = ? WHERE Email = ?";
         try (Connection conn = JDBCHelper.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, newPassword);

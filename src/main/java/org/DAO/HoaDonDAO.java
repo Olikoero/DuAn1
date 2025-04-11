@@ -67,4 +67,12 @@ public class HoaDonDAO extends DuAnDAO<HoaDon, String>{
         }
         return lishHoaDon;
     }
+    public List<HoaDon> search(String keyword) {
+        String sql = "SELECT * FROM hoadon WHERE "
+                + "mahd LIKE ? OR "
+                + "makh LIKE ? OR "
+                + "manv LIKE ?";
+        return this.selectBySql(sql, "%" + keyword + "%", "%" + keyword + "%", "%"
+                + keyword + "%");
+    }
 }

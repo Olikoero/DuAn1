@@ -66,7 +66,7 @@ public class NhanVienDAO extends DuAnDAO<NhanVien, String> {
         return listNhanVien.get(0);
     }
     public boolean checkEmailExists(String email) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM nhanvien WHERE emaol = ?";
+        String sql = "SELECT COUNT(*) FROM nhanvien WHERE email = ?";
         try (Connection conn = JDBCHelper.getConnection(); // Sử dụng getConnection()
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);

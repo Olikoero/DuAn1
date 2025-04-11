@@ -14,6 +14,8 @@ import org.util.XDate;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.FocusEvent;
@@ -28,7 +30,7 @@ import static org.view.QLNhanVien.setBooleanProperty;
 
 public class QLHoaDon extends JPanel {
     private JTable tableHoaDon, tableChiTiet;
-    private JTextField txtMaHD, txtMaKH, txtNgayLap, txtTongTien;
+    private JTextField txtMaHD, txtMaKH, txtNgayLap, txtTongTien,txtTimKiem;
     private JButton btnThem,btnMoi, btnPrint, btnPrev, btnNext, btnLast, btnFirst, btnThemSP, btnXoaChiTiet;
 
     public QLHoaDon() {
@@ -101,7 +103,7 @@ public class QLHoaDon extends JPanel {
 
         JLabel lblTimKiem= new JLabel("Tìm kiếm:");
         lblTimKiem.setBounds(15,10,100,30);
-        JTextField txtTimKiem= new JTextField();
+         txtTimKiem= new JTextField();
         txtTimKiem.setBounds(100,10,455,30);
 
         tableHoaDon = new JTable(new DefaultTableModel( new Object[][]{},
@@ -185,6 +187,23 @@ public class QLHoaDon extends JPanel {
             }
         });
         btnXoaChiTiet.addActionListener(e -> delete());
+        txtTimKiem.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                search();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                search();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                search();
+            }
+        });
+
     }
     int row=-1;
     HoaDonDAO hdDAO= new HoaDonDAO();
@@ -236,6 +255,24 @@ public class QLHoaDon extends JPanel {
     void last(){
         this.row = tableHoaDon.getRowCount()-1;
         this.edit();
+    }
+    private void search() {
+        String keyword = txtTimKiem.getText().trim();
+        DefaultTableModel model = (DefaultTableModel) tableHoaDon.getModel();
+        model.setRowCount(0);
+        try {
+            List<HoaDon> list = hdDAO.search(keyword);
+            model.setRowCount(0);
+
+            for (HoaDon hd:list){
+                Object[] row =  {hd.getMaHD(),hd.getMaKH(), hd.getMaNV(),
+                        XDate.toString(hd.getNgayLap(),"dd/MM/yyyy"),hd.getTongTien()};
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            MsgBox.alert(this,"Lỗi tìm kiếm");
+            e.printStackTrace();
+        }
     }
     void fillTable(){
         DefaultTableModel model = (DefaultTableModel) tableHoaDon.getModel();
