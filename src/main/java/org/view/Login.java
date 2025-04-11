@@ -106,7 +106,6 @@ public class Login extends JPanel {
         String manv = txtUser.getText();
         String matKhau = new String(txtPass.getPassword());
         NhanVien nv = nvDAO.selectByID(manv);
-//9Ox3GsSd 1
         if (nv == null || manv == null || manv.trim().isEmpty()) {
             MsgBox.alert(this, "Vui lòng nhập đúng đăng nhập!");
         } else if (manv.endsWith(" ")) {
@@ -128,7 +127,11 @@ public class Login extends JPanel {
             prefs.put("password", matKhau);
             prefs.putBoolean("remember", true);
             Auth.user = nv;
-            new MainScreen();
+            Window window = SwingUtilities.getWindowAncestor(this);
+            if (window instanceof JFrame) {
+                ((JFrame) window).dispose();
+                new MainScreen();
+            }
         }
 
     }

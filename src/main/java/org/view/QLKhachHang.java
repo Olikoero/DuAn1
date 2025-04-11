@@ -46,12 +46,12 @@ public class QLKhachHang extends JPanel {
 
         JLabel lblHoTen = new JLabel("Họ và tên ");
         lblHoTen.setBounds(20, 70, 150, 30);
-        txtHoTen = new JPasswordField();
+        txtHoTen = new JTextField();
         txtHoTen.setBounds(20, 100, 330, 30);
 
         JLabel lblEmail = new JLabel("Email");
         lblEmail.setBounds(20, 130, 170, 30);
-        txtEmail = new JPasswordField();
+        txtEmail = new JTextField();
         txtEmail.setBounds(20, 160, 330, 30);
 
         JLabel lblSDT = new JLabel("Số điện thoại");
@@ -220,22 +220,26 @@ public class QLKhachHang extends JPanel {
     }
     void first(){
         this.row=0;
+        tblKhachHang.setRowSelectionInterval(row, row);
         this.edit();
     }
     void prev(){
         if(this.row>0){
             this.row--;
+            tblKhachHang.setRowSelectionInterval(row, row);
             this.edit();
         }
     }
     void next(){
         if(this.row < tblKhachHang.getRowCount()-1){
             this.row++;
+            tblKhachHang.setRowSelectionInterval(row, row);
             this.edit();
         }
     }
     void last(){
         this.row = tblKhachHang.getRowCount()-1;
+        tblKhachHang.setRowSelectionInterval(row, row);
         this.edit();
     }
     void fillTable(){
