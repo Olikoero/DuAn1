@@ -81,4 +81,22 @@ public class SanPhamDAO extends DuAnDAO<SanPham, Integer>{
         return this.selectBySql(sql, "%" + keyword + "%", "%" + keyword + "%", "%"
                 + keyword + "%", "%" + keyword + "%", "%" + keyword + "%", "%" + keyword + "%");
     }
+    public SanPham selectByTenSP(String tenSP) {
+        String sql = "SELECT * FROM sanpham WHERE tensp = ?";
+        try {
+            ResultSet rs = JDBCHelper.query(sql, tenSP);
+            if (rs.next()) {
+                SanPham sp = new SanPham();
+                sp.setMaSP(rs.getInt("masp"));
+                sp.setTenSP(rs.getString("tensp"));
+                sp.setGiaBan(rs.getDouble("giaban"));
+                // ... (các thuộc tính khác)
+                rs.getStatement().getConnection().close();
+                return sp;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi truy vấn sản phẩm: " + e.getMessage());
+        }
+        return null;
+    }
 }

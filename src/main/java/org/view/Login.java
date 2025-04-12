@@ -106,29 +106,34 @@ public class Login extends JPanel {
         String manv = txtUser.getText();
         String matKhau = new String(txtPass.getPassword());
         NhanVien nv = nvDAO.selectByID(manv);
-
-        if (nv == null) {
-            MsgBox.alert(this, "Sai tên đăng nhập!");
-        } else if (!matKhau.equals(nv.getMatKhau())) {
+        if (nv == null || manv == null || manv.trim().isEmpty()) {
+            MsgBox.alert(this, "Vui lòng nhập đúng đăng nhập!");
+        } else if (manv.endsWith(" ")) {
+            MsgBox.alert(this, "Chuỗi có khoảng trắng ở cuối!");
+        } else if (!manv.equals(nv.getMaNv())) {
+            MsgBox.alert(this, "Vui lòng nhập đúng đăng nhập!");
+        } else if (matKhau == null || matKhau.trim().isEmpty()) {
+            MsgBox.alert(this, "Vui lòng nhập mật khẩu!");
+        } else if (nv.getMatKhau() == null || !matKhau.equals(nv.getMatKhau())) {
             MsgBox.alert(this, "Sai mật khẩu!");
-        } else {
-            if (chkremember.isSelected()) {
-                prefs.put("username", manv);
-                prefs.put("password", matKhau);
-                prefs.putBoolean("remember", true);
-            } else {
-                prefs.remove("username");
-                prefs.remove("password");
-                prefs.remove("remember");
-            }
+        } else if (!chkremember.isSelected()) {
+            prefs.remove("username");
+            prefs.remove("password");
+            prefs.remove("remember");
             Auth.user = nv;
-            // Lấy JFrame cha (LoginScreen) và đóng nó
-            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            if (frame != null) {
-                frame.dispose(); // Đóng LoginScreen
+            new MainScreen();
+        } else {
+            prefs.put("username", manv);
+            prefs.put("password", matKhau);
+            prefs.putBoolean("remember", true);
+            Auth.user = nv;
+            Window window = SwingUtilities.getWindowAncestor(this);
+            if (window instanceof JFrame) {
+                ((JFrame) window).dispose();
+                new MainScreen();
             }
-            new MainScreen(); // Mở MainScreen
         }
+
     }
     private void showPanel(JPanel panel) {
         this.removeAll(); // Xóa nội dung cũ

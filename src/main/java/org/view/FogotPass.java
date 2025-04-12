@@ -103,8 +103,8 @@ public class FogotPass extends JPanel {
                 return;
             }
 
-            // Tạo mật khẩu mới
-            String newPassword = generateRandomPassword(8);
+            // Tạo mật khẩu mới 1
+            String newPassword = generateRandomPassword(6);
 
             // Cập nhật mật khẩu mới vào database
             updatePasswordInDatabase(email, newPassword);
@@ -122,10 +122,10 @@ public class FogotPass extends JPanel {
             ex.printStackTrace();
         }
     }
-
+//    ABCDEFGHIJKLMNOPQRSTUVWXYZ
     // Hàm tạo mật khẩu ngẫu nhiên
     private String generateRandomPassword(int length) {
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         Random random = new Random();
         StringBuilder password = new StringBuilder();
         for (int i = 0; i < length; i++) {
@@ -136,7 +136,7 @@ public class FogotPass extends JPanel {
 
     // Hàm cập nhật mật khẩu vào database
     private void updatePasswordInDatabase(String email, String newPassword) throws SQLException {
-        String sql = "UPDATE NhanVien SET MatKhau = ? WHERE Email = ?";
+        String sql = "UPDATE NhanVien SET mk = ? WHERE Email = ?";
         try (Connection conn = JDBCHelper.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, newPassword);

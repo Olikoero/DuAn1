@@ -96,7 +96,7 @@ public class ChangePass extends JPanel {
     NhanVienDAO dao = new NhanVienDAO();
 
     private void DoiMK() throws SQLException {
-        String manv = txtMaNV.getText();
+        String manv = Auth.user.getMaNv();
         String matKhau = new String(txtMatKhau.getPassword());
         String matKhauMoi = new String(txtMatKhau1.getPassword());
         String matKhauMoi2 = new String(txtMatKhau2.getPassword());

@@ -1,15 +1,28 @@
 package org.view;
 
+import org.DAO.KhachHangDAO;
+import org.Entity.KhachHang;
+import org.Entity.NhanVien;
+import org.Entity.SanPham;
+import org.util.Auth;
+import org.util.MsgBox;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import static org.view.QLNhanVien.*;
 
 public class QLKhachHang extends JPanel {
     private JTable tblKhachHang;
-    private JTextField txtMaKH, txtHoTen, txtEmail, txtSDT,txtDiaChi;
+    private JTextField txtMaKH, txtHoTen, txtEmail, txtSDT,txtDiaChi,txtTimKiem;
     private JButton btnFirst, btnPrev,btnNext,btnLast,btnMoi,btnXoa,btnSua,btnThem;
     public QLKhachHang(){
         setSize(986, 713);
@@ -33,12 +46,12 @@ public class QLKhachHang extends JPanel {
 
         JLabel lblHoTen = new JLabel("Họ và tên ");
         lblHoTen.setBounds(20, 70, 150, 30);
-        txtHoTen = new JPasswordField();
+        txtHoTen = new JTextField();
         txtHoTen.setBounds(20, 100, 330, 30);
 
         JLabel lblEmail = new JLabel("Email");
         lblEmail.setBounds(20, 130, 170, 30);
-        txtEmail = new JPasswordField();
+        txtEmail = new JTextField();
         txtEmail.setBounds(20, 160, 330, 30);
 
         JLabel lblSDT = new JLabel("Số điện thoại");
@@ -92,14 +105,14 @@ public class QLKhachHang extends JPanel {
         JPanel pnlDanhSach = new JPanel(null);
         JLabel lblTimKiem= new JLabel("Tìm kiếm:");
         lblTimKiem.setBounds(10,10,100,30);
-        JTextField txtTimKiem= new JTextField();
+        txtTimKiem= new JTextField();
         txtTimKiem.setBounds(140,10,406,30);
 
         pnlDanhSach.setBounds(410,100,556,583);
         pnlDanhSach.setBorder(new LineBorder(Color.BLUE,1));
         tblKhachHang = new JTable(new DefaultTableModel(
                 new Object[][]{},
-                new String[]{"MÃ KHÁCH HÀNG", "HỌ VÀ TÊN", "EMAIL", "SỐ ĐIỆN THOẠI"}
+                new String[]{"MÃ KHÁCH HÀNG", "HỌ VÀ TÊN", "EMAIL", "SỐ ĐIỆN THOẠI","ĐỊA CHỈ"}
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -120,7 +133,178 @@ public class QLKhachHang extends JPanel {
         add(pnlDanhSach);
         add(lblTitle);
         setVisible(true);
+        this.fillTable();
+        this.row=-1;
+        this.updateStatus();
+        btnThem.addActionListener(e -> insert());
+        btnSua.addActionListener(e -> update());
+        btnXoa.addActionListener(e -> delete());
+        btnMoi.addActionListener(e -> clearForm());
+        btnFirst.addActionListener(e -> first());
+        btnPrev.addActionListener(e -> prev());
+        btnNext.addActionListener(e -> next());
+        btnLast.addActionListener(e -> last());
+        tblKhachHang.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    row = tblKhachHang.getSelectedRow();
+                    edit();
+                }
+            }
+        });
+        txtTimKiem.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                search();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                search();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                search();
+            }
+        });
     }
+    KhachHangDAO dao = new KhachHangDAO();
+    int row=-1;
+
+    void insert(){
+        KhachHang kh= getForm();
+
+            try {
+                dao.insert(kh);this.fillTable();this.clearForm();
+                MsgBox.alert(this, "Thêm mới thành công");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Thêm mới thất bại");
+            }
+    }
+    void update(){
+        KhachHang kh= getForm();
+            try {
+                dao.update(kh);this.fillTable();
+                MsgBox.alert(this, "Cập nhật thành công");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Cập nhật thất bại");
+            }
+    }
+    void delete(){
+
+            String makh=txtMaKH.getText();
+            if(makh.equals(Auth.user.getMaNv())){
+                MsgBox.alert(this, "Bạn không được xoá chính mình");
+            } else if(MsgBox.confirm(this, "Xác nhận xoá?")){
+                try {
+                    dao.delete(makh); fillTable();clearForm();
+                    MsgBox.alert(this, "Xoá thành công!");
+                } catch (Exception e) {
+                    MsgBox.alert(this, "Xoá thất bại!");
+                }
+            }
+        }
+    void clearForm(){
+        KhachHang kh=new KhachHang();
+        this.setForm(kh);
+        this.row=-1;
+        this.updateStatus();
+    }
+    void edit(){
+        String makh=(String) tblKhachHang.getValueAt(this.row,0);
+        KhachHang kh=dao.selectByID(makh);
+        this.setForm(kh);
+        this.updateStatus();
+    }
+    void first(){
+        this.row=0;
+        tblKhachHang.setRowSelectionInterval(row, row);
+        this.edit();
+    }
+    void prev(){
+        if(this.row>0){
+            this.row--;
+            tblKhachHang.setRowSelectionInterval(row, row);
+            this.edit();
+        }
+    }
+    void next(){
+        if(this.row < tblKhachHang.getRowCount()-1){
+            this.row++;
+            tblKhachHang.setRowSelectionInterval(row, row);
+            this.edit();
+        }
+    }
+    void last(){
+        this.row = tblKhachHang.getRowCount()-1;
+        tblKhachHang.setRowSelectionInterval(row, row);
+        this.edit();
+    }
+    void fillTable(){
+        DefaultTableModel model = (DefaultTableModel) tblKhachHang.getModel();
+        model.setRowCount(0);
+        try {
+            List<KhachHang> list = dao.selectAll();
+            for (KhachHang kh:list){
+                Object[] row =  {kh.getMaKH(),kh.getTenKH(), kh.getSdt(),
+                        kh.getEmail(),kh.getDiaChi()};
+                model.addRow(row);
+            }
+
+        }catch (Exception e){
+            MsgBox.alert(this,"Lỗi truy vấn dữ liệu");
+        }
+    }
+    void setForm(KhachHang kh){
+        txtMaKH.setText(kh.getMaKH());
+        txtHoTen.setText(kh.getTenKH());
+        txtSDT.setText(kh.getSdt());
+        txtEmail.setText(kh.getEmail());
+        txtDiaChi.setText(kh.getDiaChi());
+    }
+    KhachHang getForm(){
+        KhachHang kh= new KhachHang();
+        kh.setMaKH((txtMaKH.getText()));
+        kh.setTenKH((txtHoTen.getText()));
+        kh.setSdt((txtSDT.getText()));
+        kh.setEmail(txtEmail.getText());
+        kh.setDiaChi(txtDiaChi.getText());
+        return kh;
+    }
+    void updateStatus(){
+        boolean edit=(this.row>=0);
+        boolean first=(this.row==0);
+        boolean last=(this.row==tblKhachHang.getRowCount()-1);
+        txtMaKH.setEditable(!edit);
+        btnThem.setEnabled(!edit);
+        btnSua.setEnabled(edit);
+        btnXoa.setEnabled(edit);
+        btnFirst.setEnabled(edit && !first);
+        btnPrev.setEnabled(edit && !first);
+        btnNext.setEnabled(edit && !last);
+        btnLast.setEnabled(edit && !last);
+    }
+    private void search() {
+        String keyword = txtTimKiem.getText().trim();
+        DefaultTableModel model = (DefaultTableModel) tblKhachHang.getModel();
+        model.setRowCount(0);
+        try {
+            List<KhachHang> list = dao.search(keyword);
+            model.setRowCount(0);
+
+            for (KhachHang kh:list){
+                Object[] row =  {kh.getMaKH(),kh.getTenKH(), kh.getSdt(),
+                        kh.getEmail(),kh.getDiaChi()};
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            MsgBox.alert(this,"Lỗi tìm kiếm");
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Forgot Password");
@@ -136,4 +320,5 @@ public class QLKhachHang extends JPanel {
             frame.setVisible(true);
         });
     }
+
 }
