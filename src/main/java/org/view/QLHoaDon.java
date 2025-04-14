@@ -81,7 +81,7 @@ public class QLHoaDon extends JPanel {
         JPanel pnlBtn1 = new JPanel();
         pnlBtn1.setLayout(new GridLayout(3,1,10,10));
         pnlBtn1.setBounds(650,30,250,140);
-        btnPrint = new JButton(new ImageIcon("img/save.png"));
+        btnPrint = new JButton(new ImageIcon("img/print.png"));
         btnThem = new JButton(new ImageIcon("img/add.png"));
         btnMoi = new JButton(new ImageIcon("img/new.png"));
         pnlBtn1.add(btnThem);
@@ -245,7 +245,7 @@ public class QLHoaDon extends JPanel {
                 contentStream.newLineAtOffset(0, -30);
                 contentStream.showText("--------------------------------------------------------------------------");
                 contentStream.newLineAtOffset(0, -20);
-                contentStream.showText(String.format("%-20s %-8s %-13s %-13s", "SẢN PHẨM", "SL", "GIÁ BÁN", "THÀNH TIỀN"));
+                contentStream.showText(String.format("%-20s %-8s %-13s %-13s", "SẢN PHẨM", "SL", "ĐƠN GIÁ", "THÀNH TIỀN"));
                 contentStream.newLineAtOffset(0, -15);
                 contentStream.showText("--------------------------------------------------------------------------");
 
