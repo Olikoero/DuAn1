@@ -7,6 +7,12 @@ import org.Entity.CTHD;
 import org.Entity.HoaDon;
 import org.Entity.KhachHang;
 import org.Entity.SanPham;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.util.Auth;
 import org.util.MsgBox;
 import org.util.SanPhamThemListener;
@@ -22,6 +28,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -203,6 +210,76 @@ public class QLHoaDon extends JPanel {
                 search();
             }
         });
+        btnPrint.addActionListener(e -> {
+            if (row < 0) {
+                MsgBox.alert(this, "Vui lòng chọn hóa đơn cần in!");
+                return;
+            }
+
+            try {
+                // Tạo file PDF mới
+                PDDocument document = new PDDocument();
+                PDPage page = new PDPage();
+                document.addPage(page);
+
+                PDPageContentStream contentStream = new PDPageContentStream(document, page);
+
+// Load font Unicode
+                PDFont fontUnicode = PDType0Font.load(document, new File("fonts/arial.ttf"));
+
+// Dùng fontUnicode để đảm bảo hỗ trợ tiếng Việt
+                contentStream.setFont(fontUnicode, 12);
+                contentStream.beginText();
+                contentStream.newLineAtOffset(70, 750);
+                contentStream.setFont(fontUnicode, 12);  // Tiêu đề
+                contentStream.showText("THUNDERSTORE - Hóa đơn");
+
+                contentStream.setFont(fontUnicode, 8);
+                contentStream.newLineAtOffset(0, -30);
+                contentStream.showText("Mã HD: " + txtMaHD.getText());
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("Mã KH: " + txtMaKH.getText());
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("Ngày lập: " + txtNgayLap.getText());
+
+                contentStream.newLineAtOffset(0, -30);
+                contentStream.showText("--------------------------------------------------------------------------");
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText(String.format("%-20s %-8s %-13s %-13s", "SẢN PHẨM", "SL", "GIÁ BÁN", "THÀNH TIỀN"));
+                contentStream.newLineAtOffset(0, -15);
+                contentStream.showText("--------------------------------------------------------------------------");
+
+// Ghi từng dòng chi tiết sản phẩm
+                List<CTHD> cthdList = ctDAO.selectByMaHD(txtMaHD.getText());
+                for (CTHD ct : cthdList) {
+                    contentStream.newLineAtOffset(0, -20);
+                    String line = String.format("%-20s %-8d %,10.0f %,17.0f",
+                            ct.getTenSP(), ct.getSoLuong(), ct.getGiaBan(), ct.getThanhTien());
+                    contentStream.showText(line);
+                }
+
+                contentStream.newLineAtOffset(0, -30);
+                contentStream.showText("---------------------------------------------------------------------------");
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("TỔNG TIỀN: " + txtTongTien.getText() + " VND");
+
+
+                contentStream.endText();
+                contentStream.close();
+
+                // Lưu file PDF
+                String desktopPath = System.getProperty("user.home") + "/Desktop/";
+                String fileName = desktopPath + "hoadon_" + txtMaHD.getText() + ".pdf";
+                document.save(fileName);
+                document.close();
+
+                MsgBox.alert(this, "Đã in hóa đơn ra file: " + fileName);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                MsgBox.alert(this, "In hóa đơn thất bại!");
+            }
+        });
+
 
     }
     int row=-1;
