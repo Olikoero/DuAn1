@@ -6,6 +6,7 @@ import org.Entity.CTHD;
 import org.Entity.SanPham;
 import org.util.MsgBox;
 import org.util.SanPhamThemListener;
+import org.util.XImage;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -33,6 +34,7 @@ public class ChiTietHoaDon extends JFrame {
         setSize(600, 450);
         setLayout(null);
         setLocationRelativeTo(null);
+        setIconImage(XImage.getAppIcon("/img/icon.png"));
 
         JLabel lblSearch = new JLabel("Tìm kiếm:");
         txtSearch = new JTextField();

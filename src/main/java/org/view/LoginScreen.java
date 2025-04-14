@@ -12,7 +12,7 @@ public class LoginScreen extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setResizable(false);
-        setIconImage(XImage.getAppIcon("/img/basket.png"));
+        setIconImage(XImage.getAppIcon("/img/icon.png"));
         setLocationRelativeTo(null);
 
         //Logo

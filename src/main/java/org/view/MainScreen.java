@@ -27,7 +27,7 @@ public class MainScreen extends JFrame {
         setSize(1200, 800);
         setLayout(null);
         setResizable(false);
-        setIconImage(XImage.getAppIcon("/img/basket.png"));
+        setIconImage(XImage.getAppIcon("/img/icon.png"));
         setLocationRelativeTo(null);
 
 

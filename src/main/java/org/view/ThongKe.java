@@ -92,10 +92,10 @@ public class ThongKe extends JPanel {
         pnlLocNam.add(cboNam);
 
         btnXoaLoc = new JButton("Xoá bộ lọc");
-        btnXoaLoc.setBounds(740, 25, 100, 50);
+        btnXoaLoc.setBounds(760, 10, 150, 35);
 
         btnExportExcel = new JButton("Xuất Excel");
-        btnExportExcel.setBounds(845, 25, 100, 50);
+        btnExportExcel.setBounds(760, 55, 150, 35);
         btnExportExcel.addActionListener(e -> exportToExcel());
         addCompoment(pnlLoc, pnlLocThang, pnlLocNam, btnXoaLoc, btnExportExcel);
 
@@ -105,7 +105,13 @@ public class ThongKe extends JPanel {
         JPanel pnlDoanhThu = new JPanel(null);
         tblDoanhThu = new JTable(new DefaultTableModel(
                 new Object[][]{}, new String[]{"TÊN SẢN PHẨM", "ĐÃ BÁN", "TỔNG TIỀN BÁN", "GIÁ GỐC", "LỢI NHUẬN"}
-        ));
+        ){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Không cho phép chỉnh sửa bất kỳ ô nào
+                return false;
+            }
+        });
         JScrollPane scrollPaneDT = new JScrollPane(tblDoanhThu);
         scrollPaneDT.setBounds(10, 10, 926, 285);
         pnlDoanhThu.add(scrollPaneDT);
@@ -113,7 +119,13 @@ public class ThongKe extends JPanel {
         JPanel pnlBanChay = new JPanel(null);
         tblBanChay = new JTable(new DefaultTableModel(
                 new Object[][]{}, new String[]{"TÊN SẢN PHẨM", "LOẠI SẢN PHẨM", "ĐÃ BÁN", "CÒN LẠI TRONG KHO"}
-        ));
+        ){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Không cho phép chỉnh sửa bất kỳ ô nào
+                return false;
+            }
+        });
         JScrollPane scrollPaneBC = new JScrollPane(tblBanChay);
         scrollPaneBC.setBounds(10, 10, 926, 285);
         pnlBanChay.add(scrollPaneBC);
@@ -121,7 +133,13 @@ public class ThongKe extends JPanel {
         JPanel pnlThanhTich = new JPanel(null);
         tblThanhTich = new JTable(new DefaultTableModel(
                 new Object[][]{}, new String[]{"MÃ NV", "TÊN NV", "SỐ ĐƠN ĐÃ BÁN"}
-        ));
+        ){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Không cho phép chỉnh sửa bất kỳ ô nào
+                return false;
+            }
+        });
         JScrollPane scrollPaneTT = new JScrollPane(tblThanhTich);
         scrollPaneTT.setBounds(10, 10, 926, 285);
         pnlThanhTich.add(scrollPaneTT);
