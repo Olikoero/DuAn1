@@ -4,6 +4,7 @@ import org.DAO.NhanVienDAO;
 import org.util.EmailUtils;
 import org.util.JDBCHelper;
 import org.util.MsgBox;
+import org.util.XImage;
 
 import javax.mail.MessagingException;
 import javax.swing.*;
@@ -33,7 +34,7 @@ public class FogotPass extends JPanel {
 
         // Giao diện
         JLabel lblTitle = new JLabel("THUNDER SHOP", SwingConstants.CENTER);
-        lblTitle.setIcon(new ImageIcon("img/flash.png"));
+        lblTitle.setIcon(XImage.loadIcon("/IMG/flash.png"));
         lblTitle.setForeground(Color.ORANGE);
         lblTitle.setFont(font);
         lblTitle.setBounds(10, 30, 180, 50);

@@ -3,6 +3,7 @@ package org.view;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.DAO.ThongKeDAO;
+import org.util.XImage;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -46,15 +47,15 @@ public class ThongKe extends JPanel {
         lblDoanhThuThang = new JLabel("Tháng: 0VND", SwingConstants.CENTER);
         lblDoanhThuThang.setBorder(new LineBorder(Color.BLACK, 3));
         lblDoanhThuThang.setBounds(30, 20, 250, 150);
-        lblDoanhThuThang.setIcon(new ImageIcon("img/coins.png"));
+        lblDoanhThuThang.setIcon(XImage.loadIcon("/IMG/Coin.png"));
         lblDoanhThuNam = new JLabel("Năm: 0VND", SwingConstants.CENTER);
         lblDoanhThuNam.setBorder(new LineBorder(Color.BLACK, 3));
         lblDoanhThuNam.setBounds(348, 20, 250, 150);
-        lblDoanhThuNam.setIcon(new ImageIcon("img/coins.png"));
+        lblDoanhThuNam.setIcon(XImage.loadIcon("/IMG/Coin.png"));
         lblDoanhThuTong = new JLabel("Tổng: 0VND", SwingConstants.CENTER);
         lblDoanhThuTong.setBorder(new LineBorder(Color.BLACK, 3));
         lblDoanhThuTong.setBounds(666, 20, 250, 150);
-        lblDoanhThuTong.setIcon(new ImageIcon("img/coins.png"));
+        lblDoanhThuTong.setIcon(XImage.loadIcon("/IMG/Coin.png"));
         highIcon(lblDoanhThuThang, lblDoanhThuNam, lblDoanhThuTong);
 
         addCompoment(pnlCapNhat, lblDoanhThuThang, lblDoanhThuNam, lblDoanhThuTong);
@@ -118,7 +119,7 @@ public class ThongKe extends JPanel {
 
         JPanel pnlBanChay = new JPanel(null);
         tblBanChay = new JTable(new DefaultTableModel(
-                new Object[][]{}, new String[]{"TÊN SẢN PHẨM", "LOẠI SẢN PHẨM", "ĐÃ BÁN", "CÒN LẠI TRONG KHO"}
+                new Object[][]{}, new String[]{"TÊN SẢN PHẨM", "ĐÃ BÁN", "CÒN LẠI TRONG KHO"}
         ){
             @Override
             public boolean isCellEditable(int row, int column) {

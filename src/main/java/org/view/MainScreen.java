@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -27,7 +28,7 @@ public class MainScreen extends JFrame {
         setSize(1200, 800);
         setLayout(null);
         setResizable(false);
-        setIconImage(XImage.getAppIcon("/img/icon.png"));
+        setIconImage(XImage.getAppIcon("/IMG/icon.png"));
         setLocationRelativeTo(null);
 
 
@@ -40,7 +41,7 @@ public class MainScreen extends JFrame {
         JLabel lblLogo = new JLabel();
         lblLogo.setBounds(0, 0, 200, 200);
         //image
-        ImageIcon originalIcon = new ImageIcon("img/thunder.jpg");
+        ImageIcon originalIcon = XImage.loadIcon("/IMG/thunder.jpg");
         Image scaledImage = originalIcon.getImage().getScaledInstance(lblLogo.getWidth(), lblLogo.getHeight(), Image.SCALE_SMOOTH);
         lblLogo.setIcon(new ImageIcon(scaledImage));
 
@@ -54,7 +55,7 @@ public class MainScreen extends JFrame {
         pnlUser.setBounds(0, 200, 200, 230);
         lblUser = new JLabel();
         lblUser.setBounds(10, 10, 40, 40);
-        lblUser.setIcon(new ImageIcon("img/onl.png"));
+        lblUser.setIcon(XImage.loadIcon("/IMG/onl.png"));
         txtUser = new JTextField("ALABABA");
         txtUser.setBounds(45, 10, 150, 40);
         txtUser.setBackground(defaultBorderColor);
@@ -64,14 +65,14 @@ public class MainScreen extends JFrame {
         btnMnuTroGiup.setBounds(5, 60, 190, 40);
         btnLogin = new JButton();
         btnLogin.setBounds(5, 110, 90, 50);
-        btnLogin.setIcon(XImage.loadImage("img/login.png",btnLogin));
+        btnLogin.setIcon(XImage.loadIcon("/IMG/login.png"));
         btnLogout = new JButton();
         btnLogout.setBounds(105, 110, 90, 50);
-        btnLogout.setIcon(XImage.loadImage("img/logout.png",btnLogout));
+        btnLogout.setIcon(XImage.loadIcon("/IMG/logout.png"));
         btnChangePass = new JButton("Đổi mật khẩu");
         btnChangePass.setFont(font);
         btnChangePass.setBounds(5, 170, 190, 50);
-        btnChangePass.setIcon(new ImageIcon("img/change.png"));
+        btnChangePass.setIcon(XImage.loadIcon("/IMG/change.png"));
         addCompoment(pnlUser,lblUser,txtUser,btnMnuTroGiup,btnChangePass,btnLogin,btnLogout);
         setFontForTextFields(font,lblUser,txtUser,btnChangePass);
 
@@ -80,15 +81,15 @@ public class MainScreen extends JFrame {
         toolbar.setLayout(new GridLayout(5, 1, 2, 2));
         toolbar.setBounds(0, 430, 200, 284);
         btnMnuSanPham = new JButton("Sản phẩm");
-        btnMnuSanPham.setIcon(new ImageIcon("img/product.png"));
+        btnMnuSanPham.setIcon(XImage.loadIcon("/IMG/product.png"));
         btnMnuHoaDon = new JButton("Hoá đơn");
-        btnMnuHoaDon.setIcon(new ImageIcon("img/invoice.png"));
+        btnMnuHoaDon.setIcon(XImage.loadIcon("/IMG/invoice.png"));
         btnMnuNhanSu = new JButton("Nhân sự");
-        btnMnuNhanSu.setIcon(new ImageIcon("img/employ.png"));
+        btnMnuNhanSu.setIcon(XImage.loadIcon("/IMG/employ.png"));
         btnMnuKhachHang = new JButton("Khách hàng");
-        btnMnuKhachHang.setIcon(new ImageIcon("img/custom.png"));
+        btnMnuKhachHang.setIcon(XImage.loadIcon("/IMG/custom.png"));
         btnMnuThongKe = new JButton("Thống kê");
-        btnMnuThongKe.setIcon(new ImageIcon("img/statis.png"));
+        btnMnuThongKe.setIcon(XImage.loadIcon("/IMG/statis.png"));
         setFontForTextFields(menuFont,btnMnuTroGiup,btnMnuSanPham,btnMnuHoaDon,btnMnuNhanSu,
                 btnMnuKhachHang,btnMnuThongKe);
 
@@ -165,10 +166,10 @@ public class MainScreen extends JFrame {
         pnlTrangThai.setBorder(new EmptyBorder(0, 20, 0, 20));
         pnlTrangThai.setBackground(Color.getHSBColor(0.98f, 0.13f, 0.98f));
         JLabel lblTrangThai = new JLabel("Thunder DEV TEAM 2025");
-        lblTrangThai.setIcon(new ImageIcon("img/info.png"));
+        lblTrangThai.setIcon(XImage.loadIcon("/IMG/Info.png"));
 
         JLabel lblDongHo = new JLabel();
-        lblDongHo.setIcon(new ImageIcon("img/Alarm.png"));
+        lblDongHo.setIcon(XImage.loadIcon("/IMG/Alarm.png"));
         // Update clock
         Timer timer = new Timer(1000, e -> {
             lblDongHo.setText(new SimpleDateFormat("hh:mm:ss a").format(new Date()));
@@ -214,10 +215,10 @@ public class MainScreen extends JFrame {
     public void status() {
         if (Auth.isLogin()) {
             txtUser.setText(Auth.user.getHoVaTen());
-            lblUser.setIcon(new ImageIcon("img/onl.png"));
+            lblUser.setIcon(XImage.loadIcon("/IMG/onl.png"));
         } else {
             txtUser.setText("Guest");
-            lblUser.setIcon(new ImageIcon("img/off.png"));
+            lblUser.setIcon(XImage.loadIcon("/IMG/off.png"));
         }
     }
     public void Employees() {

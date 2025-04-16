@@ -18,8 +18,21 @@ public class XImage {
         return new ImageIcon(scaledImage);
     }
     public static Image getAppIcon(String file){
-        URL url=XImage.class.getResource(file);
+        URL url = XImage.class.getResource(file);
+        if (url == null) {
+            System.out.println("Không tìm thấy ảnh: " + file);
+            return null;
+        }
         return new ImageIcon(url).getImage();
+    }
+    public static ImageIcon loadIcon(String pathInJar) {
+        URL url = XImage.class.getResource(pathInJar);
+        if (url != null) {
+            return new ImageIcon(url);
+        } else {
+            System.out.println("Không tìm thấy ảnh: " + pathInJar);
+            return null;
+        }
     }
     public static void save(File src){
         File dst=new File("IMG",src.getName());
