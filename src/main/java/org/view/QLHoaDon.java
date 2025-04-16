@@ -400,7 +400,11 @@ public class QLHoaDon extends JPanel {
         hd.setMaKH((txtMaKH.getText()));
         hd.setMaNV((Auth.user.getMaNv()));
         hd.setNgayLap(XDate.toDate(txtNgayLap.getText(),"dd/MM/yyyy"));
-        hd.setTongTien(Double.parseDouble(txtTongTien.getText()));
+        if(txtTongTien.getText().isEmpty()){
+            hd.setTongTien(0.0);
+        }else {
+            hd.setTongTien(Double.parseDouble(txtTongTien.getText()));
+        }
         return hd;
     }
     void delete() {
