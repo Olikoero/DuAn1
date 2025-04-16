@@ -6,6 +6,7 @@ import org.Entity.NhanVien;
 import org.Entity.SanPham;
 import org.util.Auth;
 import org.util.MsgBox;
+import org.util.XImage;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -67,10 +68,10 @@ public class QLKhachHang extends JPanel {
         JPanel pnlBtn2 = new JPanel();
         pnlBtn2.setLayout(new GridLayout(1,4,10,10));
         pnlBtn2.setBounds(10,400,350,30);
-        btnFirst = new JButton(new ImageIcon("img/first.png"));
-        btnPrev = new JButton(new ImageIcon("img/left.png"));
-        btnNext = new JButton(new ImageIcon("img/right.png"));
-        btnLast = new JButton(new ImageIcon("img/last.png"));
+        btnFirst = new JButton(XImage.loadIcon("/IMG/First.png"));
+        btnPrev = new JButton(XImage.loadIcon("/IMG/Left.png"));
+        btnNext = new JButton(XImage.loadIcon("/IMG/Right.png"));
+        btnLast = new JButton(XImage.loadIcon("/IMG/Last.png"));
         pnlBtn2.add(btnFirst);
         pnlBtn2.add(btnPrev);
         pnlBtn2.add(btnNext);
@@ -86,10 +87,10 @@ public class QLKhachHang extends JPanel {
         JPanel pnlBtn1 = new JPanel();
         pnlBtn1.setLayout(new GridLayout(2,2,30,20));
         pnlBtn1.setBounds(20,553,370,130);
-        btnMoi = new JButton(new ImageIcon("img/new.png"));
-        btnXoa = new JButton(new ImageIcon("img/delete.png"));
-        btnSua = new JButton(new ImageIcon("img/save.png"));
-        btnThem = new JButton(new ImageIcon("img/add.png"));
+        btnMoi = new JButton(XImage.loadIcon("/IMG/new.png"));
+        btnXoa = new JButton(XImage.loadIcon("/IMG/Delete.png"));
+        btnSua = new JButton(XImage.loadIcon("/IMG/Save.png"));
+        btnThem = new JButton(XImage.loadIcon("/IMG/add.png"));
         pnlBtn1.add(btnMoi);
         pnlBtn1.add(btnXoa);
         pnlBtn1.add(btnSua);

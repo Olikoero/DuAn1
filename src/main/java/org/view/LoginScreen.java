@@ -12,13 +12,13 @@ public class LoginScreen extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setResizable(false);
-        setIconImage(XImage.getAppIcon("/img/icon.png"));
+        setIconImage(XImage.getAppIcon("/IMG/icon.png"));
         setLocationRelativeTo(null);
 
         //Logo
         JLabel lblLogo = new JLabel();
         lblLogo.setBounds(0, 0, 500, 500);
-        lblLogo.setIcon(new ImageIcon("img/thunderb.png"));
+        lblLogo.setIcon(XImage.loadIcon("/IMG/Thunderb.png"));
 
         JPanel pnlLogin = new Login();
         pnlLogin.setBounds(500, 0, 200, 500);

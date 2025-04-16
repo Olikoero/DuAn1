@@ -12,6 +12,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
 import java.util.List;
 
 public class ChiTietHoaDon extends JFrame {
@@ -34,7 +37,8 @@ public class ChiTietHoaDon extends JFrame {
         setSize(600, 450);
         setLayout(null);
         setLocationRelativeTo(null);
-        setIconImage(XImage.getAppIcon("/img/icon.png"));
+
+        setIconImage(XImage.getAppIcon("/IMG/icon.png"));
 
         JLabel lblSearch = new JLabel("Tìm kiếm:");
         txtSearch = new JTextField();

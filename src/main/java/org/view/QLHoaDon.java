@@ -13,10 +13,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.util.Auth;
-import org.util.MsgBox;
-import org.util.SanPhamThemListener;
-import org.util.XDate;
+import org.util.*;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -81,9 +78,9 @@ public class QLHoaDon extends JPanel {
         JPanel pnlBtn1 = new JPanel();
         pnlBtn1.setLayout(new GridLayout(3,1,10,10));
         pnlBtn1.setBounds(650,30,250,140);
-        btnPrint = new JButton(new ImageIcon("img/print.png"));
-        btnThem = new JButton(new ImageIcon("img/add.png"));
-        btnMoi = new JButton(new ImageIcon("img/new.png"));
+        btnPrint = new JButton(XImage.loadIcon("/IMG/print.png"));
+        btnThem = new JButton(XImage.loadIcon("/IMG/add.png"));
+        btnMoi = new JButton(XImage.loadIcon("/IMG/new.png"));
         pnlBtn1.add(btnThem);
         pnlBtn1.add(btnPrint);
         pnlBtn1.add(btnMoi);
@@ -93,10 +90,10 @@ public class QLHoaDon extends JPanel {
         pnlBtn2.setLayout(new GridLayout(1,4,60,10));
         pnlBtn2.setBounds(20,160,560,30);
 
-        btnFirst = new JButton(new ImageIcon("img/first.png"));
-        btnPrev = new JButton(new ImageIcon("img/left.png"));
-        btnNext = new JButton(new ImageIcon("img/right.png"));
-        btnLast = new JButton(new ImageIcon("img/last.png"));
+        btnFirst = new JButton(XImage.loadIcon("/IMG/First.png"));
+        btnPrev = new JButton(XImage.loadIcon("/IMG/Left.png"));
+        btnNext = new JButton(XImage.loadIcon("/IMG/Right.png"));
+        btnLast = new JButton(XImage.loadIcon("/IMG/Last.png"));
         pnlBtn2.add(btnFirst);
         pnlBtn2.add(btnPrev);
         pnlBtn2.add(btnNext);
@@ -315,22 +312,26 @@ public class QLHoaDon extends JPanel {
     }
     void first(){
         this.row=0;
+        tableHoaDon.setRowSelectionInterval(row, row);
         this.edit();
     }
     void prev(){
         if(this.row>0){
             this.row--;
+            tableHoaDon.setRowSelectionInterval(row, row);
             this.edit();
         }
     }
     void next(){
         if(this.row < tableHoaDon.getRowCount()-1){
             this.row++;
+            tableHoaDon.setRowSelectionInterval(row, row);
             this.edit();
         }
     }
     void last(){
         this.row = tableHoaDon.getRowCount()-1;
+        tableHoaDon.setRowSelectionInterval(row, row);
         this.edit();
     }
     private void search() {

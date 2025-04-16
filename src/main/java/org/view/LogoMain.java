@@ -1,5 +1,7 @@
 package org.view;
 
+import org.util.XImage;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,7 +10,7 @@ public class LogoMain extends JPanel {
         setSize(986, 713);
         setLayout(new BorderLayout());
         JLabel lblMain = new JLabel();
-        lblMain.setIcon(new ImageIcon("img/thunder2.png"));
+        lblMain.setIcon(XImage.loadIcon("/IMG/thunder2.png"));
 //        add(lblMain, BorderLayout.CENTER);
 //        ImageIcon originalIcon1 = new ImageIcon("img/thunder2.png");
 //        Image scaledImage1 = originalIcon1.getImage().getScaledInstance(986, 713, Image.SCALE_SMOOTH);

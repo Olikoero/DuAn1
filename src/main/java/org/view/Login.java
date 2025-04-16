@@ -25,7 +25,7 @@ public class Login extends JPanel {
         setBackground(Color.white);
         //Title
         JLabel lblTitle = new JLabel("THUNDER SHOP", SwingConstants.CENTER);
-        lblTitle.setIcon(new ImageIcon("img/flash.png"));
+        lblTitle.setIcon(XImage.loadIcon("/IMG/flash.png"));
         lblTitle.setForeground(Color.ORANGE);
         Font font = new Font("Bernard MT Condensed", Font.BOLD, 24);
         Font font2 = new Font("Arial", Font.BOLD, 20);
@@ -54,7 +54,7 @@ public class Login extends JPanel {
         chkremember.setBackground(Color.WHITE);
 
         btnLogin = new JButton();
-        btnLogin.setIcon(new ImageIcon("img/loginn.png"));
+        btnLogin.setIcon(XImage.loadIcon("/IMG/loginn.png"));
         btnLogin.setBounds(80, 320, 40, 40);
         btnLogin.setFocusPainted(false);
         btnLogin.setBackground(Color.WHITE);

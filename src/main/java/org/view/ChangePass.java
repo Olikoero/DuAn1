@@ -3,6 +3,7 @@ package org.view;
 import org.DAO.NhanVienDAO;
 import org.util.Auth;
 import org.util.MsgBox;
+import org.util.XImage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +22,7 @@ public class ChangePass extends JPanel {
         setSize(986, 713);
         setLayout(null);
         setVisible(true);
-        backgroundImage = new ImageIcon("img/background.png").getImage();
+        backgroundImage = XImage.loadIcon("/IMG/background.png").getImage();
 
         Font font = new Font("Arial", Font.BOLD, 30);
         Font font1 = new Font("Arial", Font.BOLD, 16);
@@ -29,12 +30,6 @@ public class ChangePass extends JPanel {
         lblTitle.setFont(font);
         lblTitle.setForeground(Color.BLUE);
         lblTitle.setBounds(368,150,300,50);
-
-//        JLabel lblMaNV = new JLabel("TÊN ĐĂNG NHẬP");
-//        lblMaNV.setBounds(368, 150, 250, 30);
-//        lblMaNV.setFont(font1);
-//        txtMaNV = new JTextField();
-//        txtMaNV.setBounds(368, 180, 250, 30);
 
         JLabel lblMatKhau = new JLabel("MẬT KHẨU HIỆN TẠI");
         lblMatKhau.setBounds(368, 250, 250, 30);
@@ -57,10 +52,10 @@ public class ChangePass extends JPanel {
         // Tạo các JButton
         btnDongY = new JButton("ĐỒNG Ý");
         btnDongY.setBounds(368,500 , 120, 70);
-        btnDongY.setIcon(new ImageIcon("img/Refresh.png"));
+        btnDongY.setIcon(XImage.loadIcon("/IMG/Refresh.png"));
         btnHuyBo = new JButton("Hủy bỏ");
         btnHuyBo.setBounds(497, 500, 120, 70);
-        btnHuyBo.setIcon(new ImageIcon("img/No.png"));
+        btnHuyBo.setIcon(XImage.loadIcon("/IMG/No.png"));
         AbstractButton[] comp={btnDongY,btnHuyBo};
 
         setBooleanProperty(comp, AbstractButton::setFocusPainted, false);
@@ -115,11 +110,9 @@ public class ChangePass extends JPanel {
     }
 
     private void huyBo() {
-        Window window = SwingUtilities.getWindowAncestor(this);
-        if (window != null) {
-            window.dispose();
-        }
-
+        txtMatKhau.setText("");
+        txtMatKhau1.setText("");
+        txtMatKhau2.setText("");
     }
 public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {

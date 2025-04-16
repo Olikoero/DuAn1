@@ -17,6 +17,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -109,10 +110,10 @@ public class QLSanPham extends JPanel {
         JPanel pnlBtn1 = new JPanel();
         pnlBtn1.setLayout(new GridLayout(2, 2, 10, 30));
         pnlBtn1.setBounds(720, 40, 206, 260);
-        btnMoi = new JButton(new ImageIcon("img/new.png"));
-        btnXoa = new JButton(new ImageIcon("img/delete.png"));
-        btnSua = new JButton(new ImageIcon("img/save.png"));
-        btnThem = new JButton(new ImageIcon("img/add.png"));
+        btnMoi = new JButton(XImage.loadIcon("/IMG/new.png"));
+        btnXoa = new JButton(XImage.loadIcon("/IMG/Delete.png"));
+        btnSua = new JButton(XImage.loadIcon("/IMG/Save.png"));
+        btnThem = new JButton(XImage.loadIcon("/IMG/add.png"));
         pnlBtn1.add(btnMoi);
         pnlBtn1.add(btnXoa);
         pnlBtn1.add(btnSua);
@@ -121,10 +122,10 @@ public class QLSanPham extends JPanel {
         JPanel pnlBtn2 = new JPanel();
         pnlBtn2.setLayout(new GridLayout(1, 4, 10, 10));
         pnlBtn2.setBounds(10, 270, 440, 30);
-        btnFirst = new JButton(new ImageIcon("img/first.png"));
-        btnPrev = new JButton(new ImageIcon("img/left.png"));
-        btnNext = new JButton(new ImageIcon("img/right.png"));
-        btnLast = new JButton(new ImageIcon("img/last.png"));
+        btnFirst = new JButton(XImage.loadIcon("/IMG/First.png"));
+        btnPrev = new JButton(XImage.loadIcon("/IMG/Left.png"));
+        btnNext = new JButton(XImage.loadIcon("/IMG/Right.png"));
+        btnLast = new JButton(XImage.loadIcon("/IMG/Last.png"));
         pnlBtn2.add(btnFirst);
         pnlBtn2.add(btnPrev);
         pnlBtn2.add(btnNext);
@@ -459,12 +460,15 @@ public class QLSanPham extends JPanel {
 
         if (sp.getAnh() != null) {
             lblAnh.setToolTipText(sp.getAnh());
-            ImageIcon icon = XImage.read(sp.getAnh());
-            if (icon != null) {
+
+            URL url = getClass().getResource("/IMG/" + sp.getAnh());
+            if (url != null) {
+                ImageIcon icon = new ImageIcon(url);
                 Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
                 lblAnh.setIcon(new ImageIcon(scaledImage));
             } else {
                 lblAnh.setIcon(null);
+                System.out.println("Không tìm thấy ảnh: " + sp.getAnh());
             }
         } else {
             lblAnh.setIcon(null);
@@ -511,20 +515,18 @@ public class QLSanPham extends JPanel {
         }
     }
 
-    void updateStatus() {
-        boolean edit = (this.row >= 0);
-        boolean first = (this.row == 0);
-        boolean last = (this.row == tblSanPham.getRowCount() - 1);
-
+    void updateStatus(){
+        boolean edit=(this.row>=0);
+        boolean first=(this.row==0);
+        boolean last=(this.row==tblSanPham.getRowCount()-1);
         txtMaSP.setEditable(!edit);
         btnThem.setEnabled(!edit);
         btnSua.setEnabled(edit);
         btnXoa.setEnabled(edit);
-
-        btnFirst.setEnabled(tblSanPham.getRowCount() > 0 && !first);
-        btnPrev.setEnabled(tblSanPham.getRowCount() > 0 && !first);
-        btnNext.setEnabled(tblSanPham.getRowCount() > 0 && !last);
-        btnLast.setEnabled(tblSanPham.getRowCount() > 0 && !last);
+        btnFirst.setEnabled(edit && !first);
+        btnPrev.setEnabled(edit && !first);
+        btnNext.setEnabled(edit && !last);
+        btnLast.setEnabled(edit && !last);
     }
 
     public static void main(String[] args) {
