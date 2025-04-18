@@ -26,6 +26,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -72,6 +73,7 @@ public class QLHoaDon extends JPanel {
 
         JLabel lblTongTien = new JLabel("Tổng tiền:");
         txtTongTien = new JTextField();
+        txtTongTien.setEnabled(false);
         lblTongTien.setBounds(330, 70, 100, 30);
         txtTongTien.setBounds(330, 100, 250, 30);
 
@@ -284,14 +286,45 @@ public class QLHoaDon extends JPanel {
     ChiTietHoaDonDAO ctDAO= new ChiTietHoaDonDAO();
     SanPhamDAO spDAO= new SanPhamDAO();
 
-    void insert(){
-        HoaDon hd= getForm();
+    void insert() {
+        // Validate input fields
+        if (txtMaHD.getText().trim().isEmpty()) {
+            MsgBox.alert(this, "Vui lòng nhập mã hóa đơn!");
+            return;
+        }
+        if (txtMaKH.getText().trim().isEmpty()) {
+            MsgBox.alert(this, "Vui lòng nhập mã khách hàng!");
+            return;
+        }
 
+        // Check if makh exists in khachhang table
         try {
-            hdDAO.insert(hd);this.fillTable();this.clearForm();
-            MsgBox.alert(this, "Tạo hóa đơn thành công");
-        } catch (Exception e) {
-            MsgBox.alert(this, "Tạo hóa đơn thất bại");
+            if (!hdDAO.checkMaKHExist(txtMaKH.getText().trim())) {
+                MsgBox.alert(this, "Mã khách hàng '" + txtMaKH.getText().trim() + "' không tồn tại! Vui lòng kiểm tra lại.");
+                return;
+            }
+        } catch (SQLException e) {
+            MsgBox.alert(this, "Lỗi kiểm tra mã khách hàng: " + e.getMessage());
+            return;
+        }
+
+        // Get HoaDon from form
+        HoaDon hd = getForm();
+
+        // Insert HoaDon
+        try {
+            hdDAO.insert(hd);
+            this.fillTable();
+            this.clearForm();
+            MsgBox.alert(this, "Tạo hóa đơn thành công!");
+        } catch (SQLException e) {
+            String errorMsg = e.getMessage();
+            if (errorMsg.contains("FOREIGN KEY constraint")) {
+                errorMsg = "Mã khách hàng hoặc mã nhân viên không hợp lệ!";
+            } else if (errorMsg.contains("PRIMARY KEY constraint")) {
+                errorMsg = "Mã hóa đơn đã tồn tại! Vui lòng nhập mã khác.";
+            }
+            MsgBox.alert(this, "Lỗi tạo hóa đơn: " + errorMsg);
         }
     }
 

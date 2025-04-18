@@ -4,6 +4,8 @@
  */
 package org.util;
 
+import org.DAO.HoaDonDAO;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -23,6 +25,9 @@ public class MsgBox {
     
     public static String prompt(Component parent, String msg) {
         return JOptionPane.showInputDialog(parent,msg,"Hệ Thống Quản Lý Đào Tạo",JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static void alert(HoaDonDAO hoaDonDAO, String msg) {
     }
 
 //     public static int prompts(Component parent, String msg,  JScrollPane scrollPane) {

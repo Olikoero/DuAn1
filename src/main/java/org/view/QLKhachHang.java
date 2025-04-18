@@ -16,6 +16,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -113,7 +114,7 @@ public class QLKhachHang extends JPanel {
         pnlDanhSach.setBorder(new LineBorder(Color.BLUE,1));
         tblKhachHang = new JTable(new DefaultTableModel(
                 new Object[][]{},
-                new String[]{"MÃ KHÁCH HÀNG", "HỌ VÀ TÊN", "EMAIL", "SỐ ĐIỆN THOẠI","ĐỊA CHỈ"}
+                new String[]{"MÃ KHÁCH HÀNG", "HỌ VÀ TÊN", "SỐ ĐIỆN THOẠI", "EMAIL","ĐỊA CHỈ"}
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -176,13 +177,22 @@ public class QLKhachHang extends JPanel {
 
     void insert(){
         KhachHang kh= getForm();
-
-            try {
-                dao.insert(kh);this.fillTable();this.clearForm();
-                MsgBox.alert(this, "Thêm mới thành công");
-            } catch (Exception e) {
-                MsgBox.alert(this, "Thêm mới thất bại");
-            }
+        try {
+        if(txtMaKH.getText().isEmpty() | txtHoTen.getText().isEmpty()){
+            MsgBox.alert(this,"Vui lòng không được để trống thông tin liên hệ!");
+            return ;
+        }else if (kh.getSdt() == null || kh.getSdt().trim().isEmpty() || !kh.getSdt().trim().matches("^0[0-9]{9}$")) {
+            MsgBox.alert(this, "Số điện thoại không đúng định dạng!");
+            return;
+        }else {
+            dao.insert(kh);
+            this.fillTable();
+            this.clearForm();
+            MsgBox.alert(this, "Thêm mới thành công");
+        }
+            } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
     void update(){
         KhachHang kh= getForm();
