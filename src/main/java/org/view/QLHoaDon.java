@@ -19,6 +19,7 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.FocusEvent;
@@ -267,8 +268,12 @@ public class QLHoaDon extends JPanel {
                 contentStream.close();
 
                 // Lưu file PDF
-                String desktopPath = System.getProperty("user.home") + "/Desktop/";
-                String fileName = desktopPath + "hoadon_" + txtMaHD.getText() + ".pdf";
+//                String desktopPath = System.getProperty("user.home") + "/Desktop/";
+//                String fileName = desktopPath + "hoadon_" + txtMaHD.getText() + ".pdf";
+//                document.save(fileName);
+//                document.close();
+                File desktopDir = FileSystemView.getFileSystemView().getHomeDirectory();
+                String fileName = desktopDir.getAbsolutePath() + "/hoadon_" + txtMaHD.getText() + ".pdf";
                 document.save(fileName);
                 document.close();
 
