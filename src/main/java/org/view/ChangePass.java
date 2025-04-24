@@ -100,6 +100,9 @@ public class ChangePass extends JPanel {
             MsgBox.alert(this, "Sai tên đăng nhập!");
         } else if (!matKhau.equals(Auth.user.getMatKhau())) {
             MsgBox.alert(this, "Sai mật khẩu!");
+        } else if (matKhauMoi.isEmpty() || matKhauMoi2.isEmpty()) {
+            MsgBox.alert(this, "Không được để trống mật khẩu mới");
+
         } else if (!matKhauMoi.equals(matKhauMoi2)) {
             MsgBox.alert(this, "Xác nhận mật khẩu không đúng!");
         } else {

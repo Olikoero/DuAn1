@@ -56,12 +56,13 @@ public class MainScreen extends JFrame {
         lblUser = new JLabel();
         lblUser.setBounds(10, 10, 40, 40);
         lblUser.setIcon(XImage.loadIcon("/IMG/onl.png"));
-        txtUser = new JTextField("ALABABA");
+        txtUser = new JTextField("a");
         txtUser.setBounds(45, 10, 150, 40);
         txtUser.setBackground(defaultBorderColor);
-        txtUser.setBorder(BorderFactory.createEmptyBorder(0,15,0,15));
+        txtUser.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
         txtUser.setEditable(false);
-        btnMnuTroGiup = new JButton("Hướng dẫn");
+        txtUser.setFont(new Font("Arial",Font.BOLD,14));
+        btnMnuTroGiup = new JButton("Trang chủ");
         btnMnuTroGiup.setBounds(5, 60, 190, 40);
         btnLogin = new JButton();
         btnLogin.setBounds(5, 110, 90, 50);
@@ -74,7 +75,7 @@ public class MainScreen extends JFrame {
         btnChangePass.setBounds(5, 170, 190, 50);
         btnChangePass.setIcon(XImage.loadIcon("/IMG/change.png"));
         addCompoment(pnlUser,lblUser,txtUser,btnMnuTroGiup,btnChangePass,btnLogin,btnLogout);
-        setFontForTextFields(font,lblUser,txtUser,btnChangePass);
+        setFontForTextFields(font,lblUser,btnChangePass);
 
         //menubar
         JPanel toolbar = new JPanel();
@@ -205,7 +206,11 @@ public class MainScreen extends JFrame {
         }
     }
     void DangNhap(){
-        new LoginScreen().setVisible(true);
+        if(Auth.isLogin()){
+            MsgBox.alert(this, "Bạn đã đăng nhập");
+        }else {
+            new LoginScreen().setVisible(true);
+        }
     }
     void DangXuat(){
         Auth.clear();

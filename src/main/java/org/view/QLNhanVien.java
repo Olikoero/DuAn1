@@ -81,6 +81,7 @@ public class QLNhanVien extends JPanel {
         rdoTruongPhong.setBounds(20, 340, 150, 30);
         rdoNhanVien = new JRadioButton("Nhân viên");
         rdoNhanVien.setBounds(200, 340, 150, 30);
+        rdoNhanVien.setSelected(true);
         ButtonGroup vaiTroGroup = new ButtonGroup();
         vaiTroGroup.add(rdoTruongPhong);
         vaiTroGroup.add(rdoNhanVien);
@@ -199,17 +200,13 @@ public class QLNhanVien extends JPanel {
     int row =-1;
     void insert(){
         NhanVien nv= getForm();
-        String mk2= new String(txtMatKhau2.getPassword());
-        if(!mk2.equals(nv.getMatKhau())){
-            MsgBox.alert(this,"Xác nhận mật khẩu không đúng");
-        }else{
             try {
                 dao.insert(nv);this.fillTable();this.clearForm();
                 MsgBox.alert(this, "Thêm mới thành công");
             } catch (Exception e) {
                 MsgBox.alert(this, "Thêm mới thất bại");
             }
-        }
+
     }
     void update(){
         NhanVien nv= getForm();
@@ -300,12 +297,26 @@ public class QLNhanVien extends JPanel {
         txtEmail.setText(nv.getEmail());
     }
     NhanVien getForm(){
-        NhanVien nv= new NhanVien();
-        nv.setMaNv((txtMaNV.getText()));
-        nv.setHoVaTen((txtHoTen.getText()));
-        nv.setMatKhau((txtMatKhau.getText()));
-        nv.setVaiTro(rdoTruongPhong.isSelected());
-        nv.setEmail((txtEmail.getText()));
+        NhanVien nv = new NhanVien();
+        String mk2= new String(txtMatKhau2.getPassword());
+        String mk= new String(txtMatKhau.getPassword());
+        if(txtMaNV.getText().isEmpty()){
+            MsgBox.alert(this, "Mã NV không được để trống");
+        }else if (txtMatKhau.getText().isEmpty()){
+            MsgBox.alert(this, "Mật khẩu không được để trống");
+        }else if(!mk2.equals(mk)){
+            MsgBox.alert(this,"Xác nhận mật khẩu không đúng");
+        }else if (txtHoTen.getText().isEmpty()){
+            MsgBox.alert(this, "Tên NV không được để trống");
+        }else if (txtEmail.getText().isEmpty() || !txtEmail.getText().matches("\\w+@\\w+.\\w+")){
+            MsgBox.alert(this, "Sai định dạng email");
+        }else {
+            nv.setMaNv((txtMaNV.getText()));
+            nv.setHoVaTen((txtHoTen.getText()));
+            nv.setMatKhau((txtMatKhau.getText()));
+            nv.setVaiTro(rdoTruongPhong.isSelected());
+            nv.setEmail((txtEmail.getText()));
+        }
         return nv;
     }
     void updateStatus(){

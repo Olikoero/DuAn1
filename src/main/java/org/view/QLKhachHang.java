@@ -179,8 +179,11 @@ public class QLKhachHang extends JPanel {
         KhachHang kh= getForm();
         try {
         if(txtMaKH.getText().isEmpty() | txtHoTen.getText().isEmpty()){
-            MsgBox.alert(this,"Vui lòng không được để trống thông tin liên hệ!");
+            MsgBox.alert(this,"Vui lòng không được để trống thông tin!");
             return ;
+        }else if (kh.getEmail() == null || kh.getEmail().trim().isEmpty() || !kh.getEmail().trim().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            MsgBox.alert(this, "Email không đúng định dạng!");
+            return;
         }else if (kh.getSdt() == null || kh.getSdt().trim().isEmpty() || !kh.getSdt().trim().matches("^0[0-9]{9}$")) {
             MsgBox.alert(this, "Số điện thoại không đúng định dạng!");
             return;
