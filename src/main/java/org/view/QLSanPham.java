@@ -28,10 +28,10 @@ import static org.view.QLNhanVien.setBooleanProperty;
 
 public class QLSanPham extends JPanel {
     private JTabbedPane tabs;
-    private JLabel lblAnh;
+    private JLabel lblAnh, lblTMaSp;
     private JTable tblSanPham;
     private JTextArea txtGhiChu;
-    private JTextField txtMaSP, txtSL, txtTenSP, txtGiaBan, txtGiaNhap, txtNgayNhap, txtTimKiem;
+    private JTextField txtSL, txtTenSP, txtGiaBan, txtGiaNhap, txtNgayNhap, txtTimKiem;
     private JFileChooser fileChooser;
     private JButton btnMoi, btnXoa, btnSua, btnThem, btnFirst, btnPrev, btnNext, btnLast;
     private DefaultTableModel model;
@@ -57,9 +57,9 @@ public class QLSanPham extends JPanel {
 
         JLabel lblMaSP = new JLabel("Mã SP");
         lblMaSP.setBounds(10, 10, 100, 30);
-        txtMaSP = new JTextField();
-        txtMaSP.setBounds(10, 40, 200, 30);
-        txtMaSP.setEditable(false); // Disable editing for MaSP
+        lblTMaSp = new JLabel();
+        lblTMaSp.setBounds(10, 40, 200, 30);
+        lblTMaSp.setBorder(new LineBorder(Color.GRAY ,1)); // Disable editing for MaSP
 
         JLabel lblTenSP = new JLabel("Tên SP");
         lblTenSP.setBounds(10, 70, 100, 30);
@@ -131,7 +131,7 @@ public class QLSanPham extends JPanel {
         pnlBtn2.add(btnNext);
         pnlBtn2.add(btnLast);
 
-        addCompoment(pnlCapNhat, lblMaSP, txtMaSP, lblTenSP, txtTenSP, lblSL, txtSL, lblGiaNhap, txtGiaNhap, lblGiaBan,
+        addCompoment(pnlCapNhat, lblMaSP, lblTMaSp, lblTenSP, txtTenSP, lblSL, txtSL, lblGiaNhap, txtGiaNhap, lblGiaBan,
                 txtGiaBan, lblNgayNhap, txtNgayNhap, txtGhiChu, lblGhiChu, lblHinh, lblAnh, fileChooser, pnlBtn1, pnlBtn2);
 
         //danhsach
@@ -373,7 +373,7 @@ public class QLSanPham extends JPanel {
     }
 
     private void moi() {
-        txtMaSP.setText("");
+        lblTMaSp.setText("");
         txtTenSP.setText("");
         txtSL.setText("");
         txtGiaNhap.setText("");
@@ -443,7 +443,7 @@ public class QLSanPham extends JPanel {
     }
 
     void setForm(SanPham sp) {
-        txtMaSP.setText(String.valueOf(sp.getMaSP()));
+        lblTMaSp.setText(String.valueOf(sp.getMaSP()));
         txtTenSP.setText(sp.getTenSP());
         txtSL.setText(String.valueOf(sp.getSoLuong()));
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -519,7 +519,7 @@ public class QLSanPham extends JPanel {
         boolean edit=(this.row>=0);
         boolean first=(this.row==0);
         boolean last=(this.row==tblSanPham.getRowCount()-1);
-        txtMaSP.setEditable(!edit);
+//        lblMaSp.setEditable(!edit);
         btnThem.setEnabled(!edit);
         btnSua.setEnabled(edit);
         btnXoa.setEnabled(edit);
